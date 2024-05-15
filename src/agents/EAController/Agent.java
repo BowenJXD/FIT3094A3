@@ -11,32 +11,49 @@ import java.util.function.Function;
 public class Agent implements MarioAgent {
     private boolean[] actions = null;
     FeedForwardNetwork network;
+
+    public Agent () {
+        this.network = new FeedForwardNetwork(Config.LAYER_NODES, 
+                FeedForwardNetwork.getActivationByName(Config.HIDDEN_ACTIVATION), 
+                FeedForwardNetwork.getActivationByName(Config.OUTPUT_ACTIVATION), 
+                "uniform", Config.RANDOM_SEED, null);
+    }
     
+    public Agent(Map<String, double[][]> chromosome){
+        this.network = new FeedForwardNetwork(Config.LAYER_NODES, 
+                FeedForwardNetwork.getActivationByName(Config.HIDDEN_ACTIVATION), 
+                FeedForwardNetwork.getActivationByName(Config.OUTPUT_ACTIVATION), 
+                "uniform", Config.RANDOM_SEED, chromosome);
+    } 
+
     @Override
     public void initialize(MarioForwardModel model, MarioTimer timer) {
         actions = new boolean[MarioActions.numberOfActions()];
         actions[MarioActions.RIGHT.getValue()] = true;
         actions[MarioActions.SPEED.getValue()] = true;
-
-        // Define layer sizes (input layer, hidden layers, output layer)
-        List<Integer> layerNodes = Arrays.asList(8, 4, 2); // Example: 4 inputs, 1 hidden layer with 5 neurons, and 3 outputs
-
-        // Define activation functions
-        Function<double[], double[]> hiddenActivation = FeedForwardNetwork.getActivationByName("relu");
-        Function<double[], double[]> outputActivation = FeedForwardNetwork.getActivationByName("sigmoid");
-
-        // Initialize the neural network
-        network = new FeedForwardNetwork(layerNodes, hiddenActivation, outputActivation, "uniform", 42, null);
     }
 
+    double[] mapCache = null;
+    
     @Override
     public boolean[] getActions(MarioForwardModel model, MarioTimer timer) {
-        var map = model.getMarioSceneObservation(0);
+        int[][] map = model.getMarioSceneObservation(2);
         
-        double[] inputs = {map[10][10], map[10][11], map[11][10], map[11][11], map[12][10], map[12][11], map[13][10], map[13][11]};
+        double[] inputs = getInputs(map);
         double[] outputs = network.feedForward(inputs);
-        actions[MarioActions.RIGHT.getValue()] = outputs[0] > 0.5;
-        actions[MarioActions.JUMP.getValue()] = outputs[1] > 0.5;
+        
+        if (!Arrays.equals(outputs, mapCache)) {
+            if (mapCache == null) {
+                mapCache = outputs;
+            }
+            else{
+                mapCache = outputs;
+            }
+        }
+        
+        for (int i = 0; i < outputs.length; i++) {
+            actions[Config.OUTPUT_ACTIONS[i]] = outputs[i] > 0.5;
+        }
         
         return actions;
     }
@@ -48,7 +65,18 @@ public class Agent implements MarioAgent {
 
     @Override
     public void train(MarioForwardModel model) {
-        
     }
-
+    
+    public double[] getInputs(int[][] map) {
+        int startRow = Config.INPUT_DIMENSIONS[0];
+        int width = Config.INPUT_DIMENSIONS[1];
+        int height = Config.INPUT_DIMENSIONS[2];
+        double[] inputs = new double[width * height];
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+                inputs[i * height + j] = (double) map[startRow + i][j] / 100;
+            }
+        }
+        return inputs;
+    }
 }

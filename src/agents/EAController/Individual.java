@@ -1,12 +1,16 @@
 package agents.EAController;
 
+import engine.core.MarioForwardModel;
+
 import java.util.Random;
 
-public abstract class Individual {
+public class Individual {
     private double fitness;
     private double[] chromosome;
 
-    public abstract void calculateFitness();
+    public void calculateFitness(MarioForwardModel model){
+        fitness = model.getCompletionPercentage();
+    }
 
     public double getFitness() {
         return fitness;
@@ -15,8 +19,4 @@ public abstract class Individual {
     public double[] getChromosome() {
         return chromosome;
     }
-
-    public abstract void encodeChromosome();
-
-    public abstract void decodeChromosome();
 }

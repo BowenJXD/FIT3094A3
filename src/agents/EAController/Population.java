@@ -1,5 +1,7 @@
 package agents.EAController;
 
+import engine.core.MarioForwardModel;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,9 +38,9 @@ public class Population {
         return fittest;
     }
 
-    public void calculateFitness() {
+    public void calculateFitness(MarioForwardModel model) {
         for (Individual individual : individuals) {
-            individual.calculateFitness();
+            individual.calculateFitness(model);
         }
     }
 
@@ -49,5 +51,9 @@ public class Population {
             sum += Math.pow(individual.getFitness() - mean, 2);
         }
         return Math.sqrt(sum / individuals.size());
+    }
+
+    public Individual[] getIndividuals() {
+        return individuals.toArray(new Individual[0]);
     }
 }
