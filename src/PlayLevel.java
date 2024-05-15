@@ -3,6 +3,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import engine.core.MarioGame;
 import engine.core.MarioResult;
+import util.Logger;
 
 public class PlayLevel {
     public static void printResults(MarioResult result) {
@@ -32,7 +33,17 @@ public class PlayLevel {
 
     public static void main(String[] args) {
         MarioGame game = new MarioGame();
-        MarioResult result = game.runGame(new agents.human.Agent(), getLevel("./levels/SuperMarioBros/mario-1-1.txt"), 60, 0, true, 30, 3.5f);
+        boolean player = false;
+        
+        MarioResult result;
+        if (player) {
+            // Play as a human
+            result = game.runGame(new agents.human.Agent(), getLevel("./levels/SuperMarioBros/mario-1-1.txt"), 60, 0, true, 30, 3.5f);
+        }
+        else {
+            result = game.runGame(new agents.EAController.Agent(), getLevel("./levels/SuperMarioBros/mario-1-1.txt"), 60, 0, true, 30, 3.5f);
+        }
+        Logger.getInstance().logResult(result);
         printResults(result);
     }
 }
