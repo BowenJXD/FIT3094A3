@@ -183,7 +183,7 @@ public class MarioWorld {
     }
 
     public void timeout() {
-        this.gameStatus = GameStatus.TIME_OUT;
+        this.gameStatus = GameStatus.GAME_TIME_OUT;
         this.mario.alive = false;
     }
 

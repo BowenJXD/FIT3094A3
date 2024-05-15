@@ -18,6 +18,12 @@ public class Agent implements MarioAgent {
 
     @Override
     public String getAgentName() {
-        return "DoNothingAgent";
+        return "DoNothing";
     }
+
+    @Override
+    public void train(MarioForwardModel model) {
+
+    }
+
 }

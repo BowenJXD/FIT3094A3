@@ -1,7 +1,6 @@
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-
 import engine.core.MarioGame;
 import engine.core.MarioResult;
 
@@ -33,7 +32,7 @@ public class PlayLevel {
 
     public static void main(String[] args) {
         MarioGame game = new MarioGame();
-        // printResults(game.playGame(getLevel("../levels/original/lvl-1.txt"), 200, 0));
-        printResults(game.runGame(new agents.robinBaumgarten.Agent(), getLevel("./levels/original/lvl-1.txt"), 20, 0, true));
+        MarioResult result = game.runGame(new agents.human.Agent(), getLevel("./levels/SuperMarioBros/mario-1-1.txt"), 60, 0, true, 30, 3.5f);
+        printResults(result);
     }
 }

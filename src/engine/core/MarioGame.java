@@ -13,13 +13,17 @@ import engine.helper.MarioActions;
 
 public class MarioGame {
     /**
+     * This will be set to true when being assessed for the assignment. Disables the train function and enables real time time-out.
+     */
+    private boolean assessedMode = false;
+    /**
      * the maximum time that agent takes for each step
      */
-    public static final long maxTime = 40;
+    public static final long maxTime = 15;
     /**
      * extra time before reporting that the agent is taking more time that it should
      */
-    public static final long graceTime = 10;
+    public static final long graceTime = 0;
     /**
      * Screen width
      */
@@ -39,7 +43,7 @@ public class MarioGame {
     /**
      * print debug details
      */
-    public static final boolean verbose = false;
+    public static final boolean verbose = true;
 
     /**
      * pauses the whole game at any moment
@@ -218,6 +222,22 @@ public class MarioGame {
         return this.gameLoop(level, timer, marioState, visuals, fps);
     }
 
+    public MarioResult runGame(MarioAgent agent, String level, int timer, boolean assessedMode, int marioState, boolean visuals, int fps, float scale) {
+        if (visuals) {
+            this.window = new JFrame("Mario AI Framework");
+            this.render = new MarioRender(scale);
+            this.window.setContentPane(this.render);
+            this.window.pack();
+            this.window.setResizable(false);
+            this.window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            this.render.init();
+            this.window.setVisible(true);
+        }
+        this.assessedMode = assessedMode;
+        this.setAgent(agent);
+        return this.gameLoop(level, timer, marioState, visuals, fps);
+    }
+
     private MarioResult gameLoop(String level, int timer, int marioState, boolean visual, int fps) {
         this.world = new MarioWorld(this.killEvents);
         this.world.visuals = visual;
@@ -241,20 +261,33 @@ public class MarioGame {
             this.render.addFocusListener(this.render);
         }
 
-        MarioTimer agentTimer = new MarioTimer(MarioGame.maxTime);
+        long startTime = System.currentTimeMillis();
+
+        MarioTimer agentTimer = new MarioTimer(1000 / fps);
+
         this.agent.initialize(new MarioForwardModel(this.world.clone()), agentTimer);
+
+        if(!assessedMode){
+            this.agent.train(new MarioForwardModel(this.world.clone()));
+        }
 
         ArrayList<MarioEvent> gameEvents = new ArrayList<>();
         ArrayList<MarioAgentEvent> agentEvents = new ArrayList<>();
         while (this.world.gameStatus == GameStatus.RUNNING) {
             if (!this.pause) {
+                if(assessedMode){
+                    if(System.currentTimeMillis() - startTime > timer * 1000){
+                        this.world.gameStatus = GameStatus.REAL_TIME_OUT;
+                        break;
+                    }
+                }
+
                 //get actions
-                agentTimer = new MarioTimer(MarioGame.maxTime);
+                agentTimer = new MarioTimer(1000 / fps);
                 boolean[] actions = this.agent.getActions(new MarioForwardModel(this.world.clone()), agentTimer);
                 if (MarioGame.verbose) {
-                    if (agentTimer.getRemainingTime() < 0 && Math.abs(agentTimer.getRemainingTime()) > MarioGame.graceTime) {
-                        System.out.println("The Agent is slowing down the game by: "
-                                + Math.abs(agentTimer.getRemainingTime()) + " msec.");
+                    if (agentTimer.getRemainingTime() <= 0) {
+                        System.out.println("The Agent is slowing down the game by " + Math.abs(agentTimer.getRemainingTime()) + "ms!");
                     }
                 }
                 // update world
@@ -281,4 +314,8 @@ public class MarioGame {
         }
         return new MarioResult(this.world, gameEvents, agentEvents);
     }
+
+
 }
+
+

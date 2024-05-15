@@ -59,4 +59,9 @@ public class Agent extends KeyAdapter implements MarioAgent {
         }
     }
 
+    @Override
+    public void train(MarioForwardModel model) {
+
+    }
+
 }

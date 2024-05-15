@@ -25,6 +25,6 @@ public class MarioTimer {
      * @return number of milliseconds remaining in that timer.
      */
     public long getRemainingTime() {
-        return Math.max(0, this.remainingTime - (System.currentTimeMillis() - this.startTimer));
+        return  this.remainingTime - (System.currentTimeMillis() - this.startTimer);
     }
 }
