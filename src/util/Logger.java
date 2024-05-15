@@ -14,7 +14,7 @@ import engine.core.MarioResult;
 public class Logger {
     private static Logger instance;
     private static final String FILE_NAME = "logs.csv";
-    private static final String HEADER = "GameStatus,CompletionPercentage,RemainingTime,MarioMode,KillsTotal,KillsByFire,KillsByStomp,KillsByShell,MarioNumHurts,NumBumpQuestionBlock,NumBumpBrick,KillsByFall,NumJumps,MaxXJump,MaxJumpAirTime,CurrentLives,CurrentCoins,NumCollectedMushrooms,NumCollectedFireflower,NumCollectedTileCoins,NumDestroyedBricks,GameEvents,AgentEvents";
+    private static final String HEADER = "Level,GameStatus,CompletionPercentage,RemainingTime,MarioMode,KillsTotal,KillsByFire,KillsByStomp,KillsByShell,MarioNumHurts,NumBumpQuestionBlock,NumBumpBrick,KillsByFall,NumJumps,MaxXJump,MaxJumpAirTime,CurrentLives,CurrentCoins,NumCollectedMushrooms,NumCollectedFireflower,NumCollectedTileCoins,NumDestroyedBricks,GameEvents,AgentEvents";
 
     private Logger() {
         // Private constructor to prevent instantiation from outside
@@ -28,8 +28,9 @@ public class Logger {
         return instance;
     }
 
-    public void logResult(MarioResult result) {
+    public void logResult(MarioResult result, String level) {
         try (FileWriter writer = new FileWriter(FILE_NAME, true)) {
+            writer.append(level).append(",");
             writer.append(getResultAsCSVLine(result));
             writer.append("\n");
         } catch (IOException e) {
