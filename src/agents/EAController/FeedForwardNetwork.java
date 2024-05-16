@@ -24,7 +24,7 @@ public class FeedForwardNetwork {
         this.outputActivation = outputActivation;
         this.out = new double[6];
 
-        Random rand = (seed != null) ? new Random(seed) : new Random();
+        Random rand = (seed != null) ? new Random(seed) : Config.rand;
 
         if (chromosome != null) {
             this.params = new HashMap<>(chromosome);

@@ -31,13 +31,26 @@ public class Evolution {
     public void run() {
         Config.rand = new Random(Config.RANDOM_SEED);
         
+        boolean loadData = true;
+        
         // population
-        population = new Population();
-        runAgents(population.getAgents());
-        population.agents.sort((a, b) -> Double.compare(b.getFitness(), a.getFitness()));
+        if (loadData) {
+            var agents = Logger.loadAgents(Config.POPULATION_SIZE);
+            if (!agents.isEmpty()) {
+                population = new Population(agents);
+            } else {
+                population = new Population();
+                runAgents(population.getAgents());
+            }
+        }
+        else {
+            population = new Population();
+            runAgents(population.getAgents());
+        }
 
         for (int g = 1; g < Config.MAX_GENERATIONS; g++) {
             // Selection
+            population.agents.sort((a, b) -> Double.compare(b.getFitness(), a.getFitness()));
             List<Agent> parents = Selection.rankRouletteWheel(population, Config.POPULATION_SIZE, 2);
             population.agents = parents;
             printPopulation(g);
@@ -68,9 +81,8 @@ public class Evolution {
                 offspring.add(child2);
             }
 
-            runAgents(offspring);
-            population.agents.sort((a, b) -> Double.compare(b.getFitness(), a.getFitness()));
             // Survivor selection
+            runAgents(offspring);
             population.agents.addAll(0, offspring);
         }
         
@@ -81,9 +93,7 @@ public class Evolution {
             MarioResult result = PlayLevel.runLevel(agent, Config.LEVEL_STRING);
             double percentage = result.getCompletionPercentage();
             double remainingTime = result.getRemainingTime();
-            if (agent.getFitness() < percentage) {
-                agent.setFitness(percentage * 100 + remainingTime / 1000);
-            }
+            agent.setFitness(percentage * 100 + remainingTime / 1000);
         }
     }
 

@@ -5,7 +5,7 @@ import java.util.Random;
 public class Crossover {
 
     public static double[][] uniformBinaryCrossover(double[][] parent1, double[][] parent2) {
-        Random rand = new Random();
+        Random rand = Config.rand;
         double[][] offspring1 = parent1.clone();
         double[][] offspring2 = parent2.clone();
 

@@ -33,32 +33,33 @@ public class Selection {
         List<Agent> selection = new ArrayList<>();
         List<Agent> agents = population.agents;
         Random rand = Config.rand;
-        double wheel = getSigmaPowered(agents.size(), rankPower);
         for (int i = 0; i < numAgents; i++) {
-            double pick = rand.nextDouble() * wheel;
-            double current = 0;
+            int wheel = getSigmaPowered(agents.size(), rankPower);
+            int pick = rand.nextInt(wheel);
+            int current = 0;
             for (int j = 0; j < agents.size(); j++) {
-                current += (j + 1) ^ rankPower;
+                current += (int) Math.pow(agents.size() - j, rankPower);
                 if (current > pick) {
-                    selection.add(agents.get(agents.size() - j - 1));
+                    selection.add(agents.get(j));
                     break;
                 }
             }
         }
+        selection.sort((a, b) -> Double.compare(b.getFitness(), a.getFitness()));
         return selection;
     }
     
     public static int getSigmaPowered(int n, int p){
         int result = 0;
         for (int i = 1; i <= n; i++) {
-            result += i ^ p;
+            result += (int) Math.pow(i, p);
         }
         return result;
     }
 
     public static List<Agent> tournamentSelection(Population population, int numAgents, int tournamentSize) {
         List<Agent> selection = new ArrayList<>();
-        Random rand = new Random();
+        Random rand = Config.rand;
         for (int i = 0; i < numAgents; i++) {
             List<Agent> tournament = new ArrayList<>();
             for (int j = 0; j < tournamentSize; j++) {

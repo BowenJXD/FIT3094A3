@@ -4,6 +4,7 @@ import engine.core.MarioForwardModel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.SortedSet;
 
 public class Population {
     public List<Agent> agents;
@@ -19,6 +20,13 @@ public class Population {
     
     public Population(List<Agent> agents) {
         this.agents = agents;
+        if (agents.size() < Config.POPULATION_SIZE) {
+            for (int i = agents.size(); i < Config.POPULATION_SIZE; i++) {
+                Agent agent = new Agent();
+                agent.init(0, i, null);
+                agents.add(agent);
+            }
+        }
     }
 
     public int getNumAgents() {

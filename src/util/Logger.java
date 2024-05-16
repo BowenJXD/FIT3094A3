@@ -38,18 +38,16 @@ public class Logger {
         return instance;
     }
 
-    static class AgentData {
-        private String agentName;
-        private double fitness;
-        private Map<String, double[][]> data;
+    public static class AgentData {
+        public String agentName;
+        public double fitness;
+        public Map<String, double[][]> data;
 
         public AgentData(String agentName, double fitness, Map<String, double[][]> data) {
             this.agentName = agentName;
             this.fitness = fitness;
             this.data = data;
         }
-
-        // Getters and setters for the fields
 
         // Serialization method
         public String toJson() {
@@ -77,6 +75,10 @@ public class Logger {
             String line;
             while ((line = reader.readLine()) != null) {
                 AgentData agentData = gson.fromJson(line, agentDataType);
+                // Skip duplicates
+                if (!agentDataList.isEmpty() && agentDataList.getLast().agentName.equals(agentData.agentName)) {
+                    continue;
+                }
                 agentDataList.add(agentData);
             }
         } catch (IOException e) {
@@ -85,6 +87,25 @@ public class Logger {
         }
 
         return agentDataList;
+    }
+    
+    public static List<Agent> loadAgents(int size){
+        List<Agent> agents = new ArrayList<>();
+        List<AgentData> agentDataList = readDataFromJsonFile(JSON_FILE);
+        for (AgentData agentData : agentDataList) {
+            Agent agent = new Agent(agentData.data);
+            int generation = Integer.parseInt(agentData.agentName.substring(0, agentData.agentName.indexOf("-")));
+            int id = Integer.parseInt(agentData.agentName.substring(agentData.agentName.indexOf("-") + 1));
+            agent.init(generation, id, null);
+            agent.setFitness(agentData.fitness);
+            agents.add(agent);
+        }
+        agents.sort((a, b) -> Double.compare(b.getFitness(), a.getFitness()));
+        if (agents.size() > size) {
+            agents = agents.subList(0, size);
+        }
+        
+        return agents;
     }
     
     public void logResult(MarioResult result, String level) {
