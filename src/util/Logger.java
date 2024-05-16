@@ -19,16 +19,22 @@ import engine.core.MarioEvent;
 import engine.core.MarioAgentEvent;
 import engine.core.MarioResult;
 
+// TODO: allow outputting the statistic of each run
 public class Logger {
     private static Logger instance;
-    private static final String FILE_NAME = "logs.csv";
-    private static final String HEADER = "Level,GameStatus,CompletionPercentage,RemainingTime,MarioMode,KillsTotal,KillsByFire,KillsByStomp,KillsByShell,MarioNumHurts,NumBumpQuestionBlock,NumBumpBrick,KillsByFall,NumJumps,MaxXJump,MaxJumpAirTime,CurrentLives,CurrentCoins,NumCollectedMushrooms,NumCollectedFireflower,NumCollectedTileCoins,NumDestroyedBricks,GameEvents,AgentEvents";
+    private static final String LEVEL_FILE = "logs.csv";
+    private static final String LEVEL_HEADER = "Level,GameStatus,CompletionPercentage,RemainingTime,MarioMode,KillsTotal,KillsByFire,KillsByStomp,KillsByShell,MarioNumHurts,NumBumpQuestionBlock,NumBumpBrick,KillsByFall,NumJumps,MaxXJump,MaxJumpAirTime,CurrentLives,CurrentCoins,NumCollectedMushrooms,NumCollectedFireflower,NumCollectedTileCoins,NumDestroyedBricks,GameEvents,AgentEvents";
     
     private static final String JSON_FILE = "chromosomes.json";
     
+    private static final String BESTFIT_FILE = "bestfits.csv";
+    
+    List<Double> bestfits;
+    
     private Logger() {
         // Private constructor to prevent instantiation from outside
-        checkAndWriteHeader();
+        checkAndWriteHeader(LEVEL_FILE, LEVEL_HEADER);
+        bestfits = new ArrayList<>();
     }
 
     public static Logger getInstance() {
@@ -58,6 +64,7 @@ public class Logger {
 
     public void logChromosome(Agent agent){
         AgentData agentData = new AgentData(agent.getAgentId(), agent.getFitness(), agent.getChromosome());
+        bestfits.add(agent.getFitness());
         try (FileWriter writer = new FileWriter(JSON_FILE, true)) {
             writer.append(agentData.toJson()).append("\n");
         } catch (IOException e) {
@@ -89,6 +96,15 @@ public class Logger {
         return agentDataList;
     }
     
+    public void logBestfits(){
+        StringBuilder data = new StringBuilder();
+        for (Double bestfit : bestfits) {
+            // format to 2 decimal places
+            data.append(String.format("%.2f", bestfit)).append(",");
+        }
+        logCSV(BESTFIT_FILE, data.toString());
+    }
+    
     public static List<Agent> loadAgents(int size){
         List<Agent> agents = new ArrayList<>();
         List<AgentData> agentDataList = readDataFromJsonFile(JSON_FILE);
@@ -108,14 +124,9 @@ public class Logger {
         return agents;
     }
     
-    public void logResult(MarioResult result, String level) {
-        try (FileWriter writer = new FileWriter(FILE_NAME, true)) {
-            writer.append(level).append(",");
-            writer.append(getResultAsCSVLine(result));
-            writer.append("\n");
-        } catch (IOException e) {
-            System.err.println("Error writing to file: " + e.getMessage());
-        }
+    public void logLevelResult(MarioResult result, String level) {
+        String data = getResultAsCSVLine(result);
+        logCSV(LEVEL_FILE, data);
     }
 
     private String getResultAsCSVLine(MarioResult result) {
@@ -168,14 +179,22 @@ public class Logger {
         return sb.toString();
     }
 
-    private void checkAndWriteHeader() {
-        File file = new File(FILE_NAME);
+    public void logCSV(String filename, String data) {
+        try (FileWriter writer = new FileWriter(filename, true)) {
+            writer.append(data).append("\n");
+        } catch (IOException e) {
+            System.err.println("Error writing to file: " + e.getMessage());
+        }
+    }
+    
+    private static void checkAndWriteHeader(String filename, String header) {
+        File file = new File(filename);
         boolean writeHeader = true;
 
         if (file.exists()) {
             try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
                 String firstLine = reader.readLine();
-                if (HEADER.equals(firstLine)) {
+                if (header.equals(firstLine)) {
                     writeHeader = false;
                 }
             } catch (IOException e) {
@@ -184,8 +203,8 @@ public class Logger {
         }
 
         if (writeHeader) {
-            try (FileWriter writer = new FileWriter(FILE_NAME)) {
-                writer.write(HEADER);
+            try (FileWriter writer = new FileWriter(filename)) {
+                writer.write(header);
                 writer.write("\n");
             } catch (IOException e) {
                 System.err.println("Error writing header to file: " + e.getMessage());

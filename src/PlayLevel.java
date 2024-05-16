@@ -1,9 +1,10 @@
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
-import agents.EAController.Agent;
 import engine.core.MarioAgent;
 import engine.core.MarioGame;
 import engine.core.MarioResult;
@@ -48,21 +49,23 @@ public class PlayLevel {
         return levels;
     }
     
-    public static void runLevels(MarioAgent agent){
+    public static List<MarioResult> runLevels(MarioAgent agent, boolean visual){
         String[] levels = getAllLevels("./levels/SuperMarioBros");
 
         MarioGame game = new MarioGame();
-        MarioResult result;
+        List<MarioResult> results = new ArrayList<>();
         for (String level : levels) {
-            result = game.runGame(agent, getLevel(level), 20, 0, true);
+            MarioResult result = game.runGame(agent, getLevel(level), 20, 0, visual, visual ? 30 : 1000);
+            results.add(result);
             game.CloseWindow();
             String levelName = level.substring(level.lastIndexOf("-") - 1, level.lastIndexOf(".")).replace("-", ".");
-            Logger.getInstance().logResult(result, levelName);
+            Logger.getInstance().logLevelResult(result, levelName);
             // printResults(result);
         }
+        return results;
     }
 
-    public static MarioResult runLevel(MarioAgent agent, String inputLevel){
+    public static MarioResult runLevel(MarioAgent agent, String inputLevel, boolean visual){
         String level;
         if (Objects.equals(inputLevel, "")){
             level = "./levels/SuperMarioBros/mario-1-1.txt";
@@ -73,10 +76,10 @@ public class PlayLevel {
 
         MarioGame game = new MarioGame();
         MarioResult result;
-        result = game.runGame(agent, getLevel(level), 20, 0, true);
+        result = game.runGame(agent, getLevel(level), 20, 0, visual, visual ? 30 : 1000);
         game.CloseWindow();
         String levelName = level.substring(level.lastIndexOf("-") - 1, level.lastIndexOf(".")).replace("-", ".");
-        Logger.getInstance().logResult(result, levelName);
+        Logger.getInstance().logLevelResult(result, levelName);
         // printResults(result);
         return result;
     }
@@ -87,6 +90,6 @@ public class PlayLevel {
         
         // MarioResult result = runLevel(agent, "1-1");
         // printResults(result);
-        runLevels(agent);
+        runLevels(agent, true);
     }
 }

@@ -57,17 +57,21 @@ public class Selection {
         return result;
     }
 
-    public static List<Agent> tournamentSelection(Population population, int numAgents, int tournamentSize) {
+    public static List<Agent> tournamentSelection(Population population, int numAgents) {
+        int tournamentSize = Config.TOURNAMENT_SIZE;
+        List<Agent> agents = new ArrayList<>(population.agents);
         List<Agent> selection = new ArrayList<>();
         Random rand = Config.rand;
         for (int i = 0; i < numAgents; i++) {
             List<Agent> tournament = new ArrayList<>();
             for (int j = 0; j < tournamentSize; j++) {
-                tournament.add(population.agents.get(rand.nextInt(population.getNumAgents())));
+                tournament.add(agents.get(rand.nextInt(agents.size())));
             }
             tournament.sort((a, b) -> Double.compare(b.getFitness(), a.getFitness()));
-            selection.add(tournament.get(0));
+            selection.add(tournament.getFirst());
+            agents.remove(tournament.getFirst());
         }
+        selection.sort((a, b) -> Double.compare(b.getFitness(), a.getFitness()));
         return selection;
     }
 }

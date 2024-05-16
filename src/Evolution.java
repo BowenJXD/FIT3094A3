@@ -31,7 +31,7 @@ public class Evolution {
     public void run() {
         Config.rand = new Random(Config.RANDOM_SEED);
         
-        boolean loadData = true;
+        boolean loadData = false;
         
         // population
         if (loadData) {
@@ -40,18 +40,16 @@ public class Evolution {
                 population = new Population(agents);
             } else {
                 population = new Population();
-                runAgents(population.getAgents());
             }
         }
         else {
             population = new Population();
-            runAgents(population.getAgents());
         }
+        runAgents(population.getAgents());
 
         for (int g = 1; g < Config.MAX_GENERATIONS; g++) {
             // Selection
-            population.agents.sort((a, b) -> Double.compare(b.getFitness(), a.getFitness()));
-            List<Agent> parents = Selection.rankRouletteWheel(population, Config.POPULATION_SIZE, 2);
+            List<Agent> parents = Selection.tournamentSelection(population, Config.POPULATION_SIZE);
             population.agents = parents;
             printPopulation(g);
             Logger.getInstance().logChromosome(parents.getFirst());
@@ -83,73 +81,43 @@ public class Evolution {
 
             // Survivor selection
             runAgents(offspring);
+            // population.agents = Selection.elitism(population, Config.ELITISM_SIZE);
             population.agents.addAll(0, offspring);
         }
         
+        Logger.getInstance().logBestfits();
     }
 
     public void runAgents(List<Agent> agents) {
+        boolean visual = false;
         for (Agent agent : agents) {
-            MarioResult result = PlayLevel.runLevel(agent, Config.LEVEL_STRING);
+            // run 1-1 only
+/*            MarioResult result = PlayLevel.runLevel(agent, Config.LEVEL_STRING, visual);
             double percentage = result.getCompletionPercentage();
             double remainingTime = result.getRemainingTime();
-            agent.setFitness(percentage * 100 + remainingTime / 1000);
+            agent.setFitness(percentage * 100 + remainingTime / 1000);*/
+            // run all levels
+            List<MarioResult> result = PlayLevel.runLevels(agent, visual);
+            List<Double> fitnesses = new ArrayList<>();
+            for (MarioResult r : result) {
+                double percentage = r.getCompletionPercentage();
+                double remainingTime = r.getRemainingTime();
+                fitnesses.add(percentage * 100 + remainingTime / 1000);
+            }
+            agent.setFitness(fitnesses.stream().mapToDouble(Double::doubleValue).average().orElse(0));
         }
     }
 
     public void printPopulation(int g) {
         StringBuilder sb = new StringBuilder();
-        sb.append("Generation: ").append(g).append(": ");
+        sb.append("G").append(g).append(": \t");
         for (Agent agent : population.getAgents()) {
-            sb.append("(");
             sb.append(agent.getAgentId()).append(": ");
             sb.append(String.format("%.2f", agent.getFitness()));
-            sb.append(") ");
-            sb.append("> ");
+            sb.append(" | ");
         }
         System.out.println(sb.toString());
     }
-    
-/*    public void train(MarioForwardModel model) {
-        // Evolutionary algorithm training loop
-        int maxGenerations = 1000;
-        int populationSize = 10;
-        for (int generation = 0; generation < maxGenerations; generation++) {
-            // Evaluate fitness of agents
-            for (Agent agent : population.getAgents()) {
-                double[] chromosome = agent.getChromosome();
-                agent
-                agent.setFitness(evaluateFitness(new FeedForwardNetwork(layerNodes, hiddenActivation, outputActivation, "uniform", 42, chromosome), model, timer));
-            }
-
-            // Selection
-            List<Agent> parents = Selection.tournamentSelection(population, populationSize, 5);
-
-            // Crossover and mutation
-            List<Agent> offspring = new ArrayList<>();
-            for (int i = 0; i < parents.size(); i += 2) {
-                Agent parent1 = parents.get(i);
-                Agent parent2 = parents.get(i + 1);
-                double[] child1Chromosome, child2Chromosome;
-                child1Chromosome = Crossover.simulatedBinaryCrossover(parent1.getChromosome().get("W1"), parent2.getChromosome().get("W1"), 1.0);
-                child2Chromosome = Crossover.simulatedBinaryCrossover(parent2.getChromosome().get("W1"), parent1.getChromosome().get("W1"), 1.0);
-                Map<String, double[][]> child1Params = new HashMap<>(parent1.getChromosome());
-                child1Params.put("W1", child1Chromosome);
-                Map<String, double[][]> child2Params = new HashMap<>(parent2.getChromosome());
-                child2Params.put("W1", child2Chromosome);
-                Mutation.gaussianMutation(child1Params.get("W1"), 0.1, null, null, 0.5);
-                Mutation.gaussianMutation(child2Params.get("W1"), 0.1, null, null, 0.5);
-                offspring.add(new Agent(child1Params));
-                offspring.add(new Agent(child2Params));
-            }
-
-            // Survivor selection
-            population.getAgents().addAll(offspring);
-            population.getAgents().sort((a, b) -> Double.compare(b.getFitness(), a.getFitness()));
-            population.getAgents().subList(populationSize, population.getAgents().size()).clear();
-        }
-    }
-    }*/
 
     public static Map<String, double[][]> deepCopyMap(Map<String, double[][]> originalMap) {
         if (originalMap == null) {
