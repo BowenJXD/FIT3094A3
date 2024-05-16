@@ -4,15 +4,17 @@ import engine.core.MarioForwardModel;
 import engine.helper.MarioActions;
 
 import java.util.List;
+import java.util.Random;
 
 public class Config {
     
-    public static final int[] INPUT_DIMENSIONS = {4, 8, 10}; // (start_row, width, height) where width and height are in number of tiles
-    public static final int[] OUTPUT_ACTIONS = {MarioActions.RIGHT.getValue(), MarioActions.JUMP.getValue()}; // Actions to be taken by the agent
+    public static final int[] INPUT_DIMENSIONS = {5, 8, 10}; // (start_row, width, height) where width and height are in number of tiles
+    public static final int[] OUTPUT_ACTIONS = {MarioActions.JUMP.getValue()}; // Actions to be taken by the agent
     public static final int[] HIDDEN_LAYERS = {5};
     public static final List<Integer> LAYER_NODES = List.of(INPUT_DIMENSIONS[1] * INPUT_DIMENSIONS[2], HIDDEN_LAYERS[0], OUTPUT_ACTIONS.length);
     
     public static final int RANDOM_SEED = 42;
+    public static Random rand = new Random(RANDOM_SEED);
     
     public static final String HIDDEN_ACTIVATION = "relu";
     public static final String OUTPUT_ACTIVATION = "sigmoid";

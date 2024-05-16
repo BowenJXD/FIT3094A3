@@ -5,16 +5,16 @@ import java.util.List;
 import java.util.Random;
 
 public class Selection {
-    public static List<Agent> elitismSelection(Population population, int numAgents) {
+    public static List<Agent> elitism(Population population, int numAgents) {
         List<Agent> agents = new ArrayList<>(population.agents);
         agents.sort((a, b) -> Double.compare(b.getFitness(), a.getFitness()));
         return agents.subList(0, numAgents);
     }
 
-    public static List<Agent> rouletteWheelSelection(Population population, int numAgents) {
+    public static List<Agent> fitnessRouletteWheel(Population population, int numAgents) {
         List<Agent> selection = new ArrayList<>();
         double wheel = population.agents.stream().mapToDouble(Agent::getFitness).sum();
-        Random rand = new Random();
+        Random rand = Config.rand;
         for (int i = 0; i < numAgents; i++) {
             double pick = rand.nextDouble() * wheel;
             double current = 0;
@@ -27,6 +27,33 @@ public class Selection {
             }
         }
         return selection;
+    }
+    
+    public static List<Agent> rankRouletteWheel(Population population, int numAgents, int rankPower) {
+        List<Agent> selection = new ArrayList<>();
+        List<Agent> agents = population.agents;
+        Random rand = Config.rand;
+        double wheel = getSigmaPowered(agents.size(), rankPower);
+        for (int i = 0; i < numAgents; i++) {
+            double pick = rand.nextDouble() * wheel;
+            double current = 0;
+            for (int j = 0; j < agents.size(); j++) {
+                current += (j + 1) ^ rankPower;
+                if (current > pick) {
+                    selection.add(agents.get(agents.size() - j - 1));
+                    break;
+                }
+            }
+        }
+        return selection;
+    }
+    
+    public static int getSigmaPowered(int n, int p){
+        int result = 0;
+        for (int i = 1; i <= n; i++) {
+            result += i ^ p;
+        }
+        return result;
     }
 
     public static List<Agent> tournamentSelection(Population population, int numAgents, int tournamentSize) {

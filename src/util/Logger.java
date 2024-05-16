@@ -8,10 +8,13 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import agents.EAController.Agent;
+import com.google.gson.reflect.TypeToken;
 import engine.core.MarioEvent;
 import engine.core.MarioAgentEvent;
 import engine.core.MarioResult;
@@ -63,6 +66,25 @@ public class Logger {
             e.printStackTrace();
             // Handle the exception according to your application's requirements
         }
+    }
+
+    public static List<AgentData> readDataFromJsonFile(String filename) {
+        List<AgentData> agentDataList = new ArrayList<>();
+        Gson gson = new Gson();
+        Type agentDataType = new TypeToken<AgentData>() {}.getType();
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                AgentData agentData = gson.fromJson(line, agentDataType);
+                agentDataList.add(agentData);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            // Handle the exception according to your application's requirements
+        }
+
+        return agentDataList;
     }
     
     public void logResult(MarioResult result, String level) {

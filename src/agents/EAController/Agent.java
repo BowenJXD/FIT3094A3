@@ -10,6 +10,7 @@ import java.util.function.Function;
 
 public class Agent extends Individual implements MarioAgent {
     private boolean[] actions = null;
+    boolean[] actionCache = null;
     FeedForwardNetwork network;
     MarioForwardModel modelCache;
     
@@ -36,6 +37,7 @@ public class Agent extends Individual implements MarioAgent {
     @Override
     public void initialize(MarioForwardModel model, MarioTimer timer) {
         actions = new boolean[MarioActions.numberOfActions()];
+        actionCache = actions.clone();
         actions[MarioActions.RIGHT.getValue()] = true;
         actions[MarioActions.SPEED.getValue()] = true;
     }
@@ -70,7 +72,13 @@ public class Agent extends Individual implements MarioAgent {
             actions[Config.OUTPUT_ACTIONS[i]] = outputs[i] > 0.5;
         }
         
+        // if Mario is on the ground and the jump action is enabled, disable it
+        if (model.isMarioOnGround() && actionCache[MarioActions.JUMP.getValue()]) {
+            actions[MarioActions.JUMP.getValue()] = false;
+        }
+
         modelCache = model;
+        actionCache = actions.clone();
         return actions;
     }
 
@@ -100,6 +108,11 @@ public class Agent extends Individual implements MarioAgent {
         double[] inputs = new double[width * height];
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
+                // consider the size of the map being smaller than the input dimensions
+                if (marioPos[0] + i >= map.length || startCol + j >= map[0].length) {
+                    inputs[i * width + j] = 0;
+                    continue;
+                }
                 inputs[i * width + j] = map[marioPos[0] + i][startCol + j];
             }
         }

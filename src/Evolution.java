@@ -10,11 +10,10 @@ import java.util.function.Function;
 
 public class Evolution {
     private Population population;
-    Random rand = new Random();
 
     private static Evolution instance;
     private Evolution() {
-        rand = new Random(Config.RANDOM_SEED);
+        Config.rand = new Random(Config.RANDOM_SEED);
     }
 
     public static Evolution getInstance() {
@@ -30,21 +29,16 @@ public class Evolution {
     }
     
     public void run() {
+        Config.rand = new Random(Config.RANDOM_SEED);
+        
         // population
         population = new Population();
+        runAgents(population.getAgents());
+        population.agents.sort((a, b) -> Double.compare(b.getFitness(), a.getFitness()));
+
         for (int g = 1; g < Config.MAX_GENERATIONS; g++) {
-            for (Agent agent : population.getAgents()) {
-                MarioResult result = PlayLevel.runLevel(agent, Config.LEVEL_STRING);
-                double percentage = result.getCompletionPercentage();
-                if (agent.getFitness() < percentage) {
-                    agent.setFitness(percentage);
-                }
-            }
-
-            population.agents.sort((a, b) -> Double.compare(b.getFitness(), a.getFitness()));
-
             // Selection
-            List<Agent> parents = Selection.elitismSelection(population, Config.POPULATION_SIZE);
+            List<Agent> parents = Selection.rankRouletteWheel(population, Config.POPULATION_SIZE, 2);
             population.agents = parents;
             printPopulation(g);
             Logger.getInstance().logChromosome(parents.getFirst());
@@ -61,10 +55,8 @@ public class Evolution {
                     double[][] child1Chromosome, child2Chromosome;
                     child1Chromosome = Crossover.uniformBinaryCrossover(child1Params.get(key), child1Params.get(key));
                     child2Chromosome = Crossover.uniformBinaryCrossover(child1Params.get(key), child1Params.get(key));
-                    /*Mutation.uniformMutationWithRespectToBestIndividual(rand, child1Params.get(key), bestAgent.getChromosome().get(key), Config.MUTATION_PROBABILITY);
-                    Mutation.uniformMutationWithRespectToBestIndividual(rand, child2Params.get(key), bestAgent.getChromosome().get(key), Config.MUTATION_PROBABILITY);*/
-                    Mutation.randomUniformMutation(rand, child1Chromosome, Config.MUTATION_PROBABILITY, -1, 1);
-                    Mutation.randomUniformMutation(rand, child2Chromosome, Config.MUTATION_PROBABILITY, -1, 1);
+                    Mutation.randomUniformMutation(child1Chromosome, Config.MUTATION_PROBABILITY, -1, 1);
+                    Mutation.randomUniformMutation(child2Chromosome, Config.MUTATION_PROBABILITY, -1, 1);
                     child1Params.put(key, child1Chromosome);
                     child2Params.put(key, child2Chromosome);
                 }
@@ -76,18 +68,25 @@ public class Evolution {
                 offspring.add(child2);
             }
 
+            runAgents(offspring);
+            population.agents.sort((a, b) -> Double.compare(b.getFitness(), a.getFitness()));
             // Survivor selection
-            // if no improvement, remove all parents
-            if (Math.abs(parents.getFirst().getFitness() - parents.getLast().getFitness()) < 0.01) {
-                population.agents.clear();
-            } else {
-                population.agents.subList(Config.POPULATION_SIZE / 2, Config.POPULATION_SIZE).clear();
-            }
-            population.agents.addAll(offspring);
+            population.agents.addAll(0, offspring);
         }
         
     }
-    
+
+    public void runAgents(List<Agent> agents) {
+        for (Agent agent : agents) {
+            MarioResult result = PlayLevel.runLevel(agent, Config.LEVEL_STRING);
+            double percentage = result.getCompletionPercentage();
+            double remainingTime = result.getRemainingTime();
+            if (agent.getFitness() < percentage) {
+                agent.setFitness(percentage * 100 + remainingTime / 1000);
+            }
+        }
+    }
+
     public void printPopulation(int g) {
         StringBuilder sb = new StringBuilder();
         sb.append("Generation: ").append(g).append(": ");
