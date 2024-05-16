@@ -48,23 +48,37 @@ public class PlayLevel {
         return levels;
     }
     
-    public static void runLevel(MarioAgent agent, String inputLevel){
-        String[] levels;
-        if (Objects.equals(inputLevel, "")){
-            levels = getAllLevels("./levels/SuperMarioBros");
-        }
-        else {
-            levels = new String[]{"./levels/SuperMarioBros/mario-" + inputLevel + ".txt"};
-        }
+    public static void runLevels(MarioAgent agent){
+        String[] levels = getAllLevels("./levels/SuperMarioBros");
 
         MarioGame game = new MarioGame();
         MarioResult result;
         for (String level : levels) {
             result = game.runGame(agent, getLevel(level), 20, 0, true);
+            game.CloseWindow();
             String levelName = level.substring(level.lastIndexOf("-") - 1, level.lastIndexOf(".")).replace("-", ".");
             Logger.getInstance().logResult(result, levelName);
-            printResults(result);
+            // printResults(result);
         }
+    }
+
+    public static MarioResult runLevel(MarioAgent agent, String inputLevel){
+        String level;
+        if (Objects.equals(inputLevel, "")){
+            level = "./levels/SuperMarioBros/mario-1-1.txt";
+        }
+        else {
+            level = "./levels/SuperMarioBros/mario-" + inputLevel + ".txt";
+        }
+
+        MarioGame game = new MarioGame();
+        MarioResult result;
+        result = game.runGame(agent, getLevel(level), 20, 0, true);
+        game.CloseWindow();
+        String levelName = level.substring(level.lastIndexOf("-") - 1, level.lastIndexOf(".")).replace("-", ".");
+        Logger.getInstance().logResult(result, levelName);
+        // printResults(result);
+        return result;
     }
 
     public static void main(String[] args) {

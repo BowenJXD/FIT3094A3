@@ -6,54 +6,63 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Population {
-    public List<Individual> individuals;
+    public List<Agent> agents;
 
-    public Population(List<Individual> individuals) {
-        this.individuals = individuals;
+    public Population(){
+        agents = new ArrayList<>();
+        for (int i = 0; i < Config.POPULATION_SIZE; i++) {
+            Agent agent = new Agent();
+            agent.init(0, i, null);
+            agents.add(agent);
+        }
+    }
+    
+    public Population(List<Agent> agents) {
+        this.agents = agents;
     }
 
-    public int getNumIndividuals() {
-        return individuals.size();
+    public int getNumAgents() {
+        return agents.size();
     }
 
-    public int getNumGenes() {
-        return individuals.get(0).getChromosome().length;
-    }
+/*    public int getNumGenes() {
+        return agents.get(0).getChromosome().length;
+    }*/
 
     public double getAverageFitness() {
         double sum = 0;
-        for (Individual individual : individuals) {
-            sum += individual.getFitness();
+        for (Agent agent : agents) {
+            sum += agent.getFitness();
         }
-        return sum / individuals.size();
+        return sum / agents.size();
     }
 
-    public Individual getFittestIndividual() {
-        Individual fittest = individuals.get(0);
-        for (Individual individual : individuals) {
-            if (individual.getFitness() > fittest.getFitness()) {
-                fittest = individual;
+    public Agent getFittestAgent() {
+        Agent fittest = agents.get(0);
+        for (Agent agent : agents) {
+            if (agent.getFitness() > fittest.getFitness()) {
+                fittest = agent;
             }
         }
         return fittest;
     }
 
-    public void calculateFitness(MarioForwardModel model) {
-        for (Individual individual : individuals) {
-            individual.calculateFitness(model);
+    public void calculateFitness() {
+        for (Agent agent : agents) {
+            agent.calculateFitness();
         }
     }
 
     public double getFitnessStd() {
         double sum = 0;
         double mean = getAverageFitness();
-        for (Individual individual : individuals) {
-            sum += Math.pow(individual.getFitness() - mean, 2);
+        for (Agent agent : agents) {
+            sum += Math.pow(agent.getFitness() - mean, 2);
         }
-        return Math.sqrt(sum / individuals.size());
+        return Math.sqrt(sum / agents.size());
     }
 
-    public Individual[] getIndividuals() {
-        return individuals.toArray(new Individual[0]);
+    public List<Agent> getAgents() {
+        return agents;
     }
 }

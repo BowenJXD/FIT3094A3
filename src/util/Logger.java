@@ -1,12 +1,17 @@
 package util;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Map;
 
+import agents.EAController.Agent;
 import engine.core.MarioEvent;
 import engine.core.MarioAgentEvent;
 import engine.core.MarioResult;
@@ -15,7 +20,9 @@ public class Logger {
     private static Logger instance;
     private static final String FILE_NAME = "logs.csv";
     private static final String HEADER = "Level,GameStatus,CompletionPercentage,RemainingTime,MarioMode,KillsTotal,KillsByFire,KillsByStomp,KillsByShell,MarioNumHurts,NumBumpQuestionBlock,NumBumpBrick,KillsByFall,NumJumps,MaxXJump,MaxJumpAirTime,CurrentLives,CurrentCoins,NumCollectedMushrooms,NumCollectedFireflower,NumCollectedTileCoins,NumDestroyedBricks,GameEvents,AgentEvents";
-
+    
+    private static final String JSON_FILE = "chromosomes.json";
+    
     private Logger() {
         // Private constructor to prevent instantiation from outside
         checkAndWriteHeader();
@@ -28,6 +35,36 @@ public class Logger {
         return instance;
     }
 
+    static class AgentData {
+        private String agentName;
+        private double fitness;
+        private Map<String, double[][]> data;
+
+        public AgentData(String agentName, double fitness, Map<String, double[][]> data) {
+            this.agentName = agentName;
+            this.fitness = fitness;
+            this.data = data;
+        }
+
+        // Getters and setters for the fields
+
+        // Serialization method
+        public String toJson() {
+            Gson gson = new GsonBuilder().create();
+            return gson.toJson(this);
+        }
+    }
+
+    public void logChromosome(Agent agent){
+        AgentData agentData = new AgentData(agent.getAgentId(), agent.getFitness(), agent.getChromosome());
+        try (FileWriter writer = new FileWriter(JSON_FILE, true)) {
+            writer.append(agentData.toJson()).append("\n");
+        } catch (IOException e) {
+            e.printStackTrace();
+            // Handle the exception according to your application's requirements
+        }
+    }
+    
     public void logResult(MarioResult result, String level) {
         try (FileWriter writer = new FileWriter(FILE_NAME, true)) {
             writer.append(level).append(",");

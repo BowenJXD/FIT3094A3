@@ -1,5 +1,7 @@
 package agents.EAController;
 
+import util.Matrix;
+
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.IntStream;
@@ -36,8 +38,8 @@ public class FeedForwardNetwork {
             this.params = new HashMap<>();
             for (int l = 1; l < layerNodes.size(); l++) {
                 if (initMethod.equals("uniform")) {
-                    params.put("W" + l, randomUniformMatrix(layerNodes.get(l), layerNodes.get(l - 1), rand));
-                    params.put("b" + l, randomUniformMatrix(layerNodes.get(l), 1, rand));
+                    params.put("W" + l, Matrix.randomUniformMatrix(layerNodes.get(l), layerNodes.get(l - 1), rand));
+                    params.put("b" + l, Matrix.randomUniformMatrix(layerNodes.get(l), 1, rand));
                 } else {
                     throw new RuntimeException("Please extend more chromosome initialization methods");
                 }
@@ -53,14 +55,14 @@ public class FeedForwardNetwork {
         for (int l = 1; l < L; l++) {
             double[][] W = params.get("W" + l);
             double[][] b = params.get("b" + l);
-            double[] Z = add(dot(W, A_prev), b);
+            double[] Z = Matrix.add(Matrix.dot(W, A_prev), b);
             A_prev = hiddenActivation.apply(Z);
             params.put("A" + l, new double[][]{A_prev});
         }
 
         double[][] W = params.get("W" + L);
         double[][] b = params.get("b" + L);
-        double[] Z = add(dot(W, A_prev), b);
+        double[] Z = Matrix.add(Matrix.dot(W, A_prev), b);
         double[] out = outputActivation.apply(Z);
         params.put("A" + L, new double[][]{out});
 
@@ -85,24 +87,8 @@ public class FeedForwardNetwork {
         if (func == null) throw new IllegalArgumentException("Unknown activation function: " + name);
         return func;
     }
-
-    private double[][] randomUniformMatrix(int rows, int cols, Random rand) {
-        double[][] matrix = new double[rows][cols];
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                matrix[i][j] = rand.nextDouble() * 2 - 1; // Uniform distribution between -1 and 1
-            }
-        }
-        return matrix;
-    }
-
-    private double[] dot(double[][] matrix, double[] vector) {
-        return Arrays.stream(matrix).mapToDouble(row -> {
-            return IntStream.range(0, row.length).mapToDouble(i -> row[i] * vector[i]).sum();
-        }).toArray();
-    }
-
-    private double[] add(double[] vector1, double[][] vector2) {
-        return IntStream.range(0, vector1.length).mapToDouble(i -> vector1[i] + vector2[i][0]).toArray();
+    
+    public Map<String, double[][]> getParams() {
+        return params;
     }
 }

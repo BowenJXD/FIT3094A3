@@ -315,7 +315,11 @@ public class MarioGame {
         return new MarioResult(this.world, gameEvents, agentEvents);
     }
 
-
+    public void CloseWindow() {
+        if (this.window != null) {
+            this.window.dispose();
+        }
+    }
 }
 
 
