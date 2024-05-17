@@ -1,5 +1,6 @@
 package util;
 
+import agents.EAController.Config;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -9,6 +10,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -22,12 +24,13 @@ import engine.core.MarioResult;
 // TODO: allow outputting the statistic of each run
 public class Logger {
     private static Logger instance;
-    private static final String LEVEL_FILE = "logs.csv";
+    private static final String LEVEL_FILE = "log/logs.csv";
     private static final String LEVEL_HEADER = "Level,GameStatus,CompletionPercentage,RemainingTime,MarioMode,KillsTotal,KillsByFire,KillsByStomp,KillsByShell,MarioNumHurts,NumBumpQuestionBlock,NumBumpBrick,KillsByFall,NumJumps,MaxXJump,MaxJumpAirTime,CurrentLives,CurrentCoins,NumCollectedMushrooms,NumCollectedFireflower,NumCollectedTileCoins,NumDestroyedBricks,GameEvents,AgentEvents";
     
-    private static final String JSON_FILE = "chromosomes.json";
+    private static String jsonFileName = "log/515-before.json";
+    private List<String> bestAgents;
     
-    private static final String BESTFIT_FILE = "bestfits.csv";
+    private static final String BESTFIT_FILE = "log/bestfits.csv";
     
     List<Double> bestfits;
     
@@ -35,6 +38,15 @@ public class Logger {
         // Private constructor to prevent instantiation from outside
         checkAndWriteHeader(LEVEL_FILE, LEVEL_HEADER);
         bestfits = new ArrayList<>();
+        bestAgents = new ArrayList<>();
+        // create a new json file to store chromosomes, the name of the file is the datetime now
+        if (Config.LOAD_DATA_PATH.equals("")) {
+            jsonFileName = "log/" + LocalDateTime.now().toString().replace(":", "-").replace(".", "-") + ".json";
+            checkAndWriteHeader(jsonFileName, "");
+        }
+        else {
+            jsonFileName = Config.LOAD_DATA_PATH;
+        }
     }
 
     public static Logger getInstance() {
@@ -62,18 +74,25 @@ public class Logger {
         }
     }
 
-    public void logChromosome(Agent agent){
-        AgentData agentData = new AgentData(agent.getAgentId(), agent.getFitness(), agent.getChromosome());
+    public void logChromosome(Agent agent) {
         bestfits.add(agent.getFitness());
-        try (FileWriter writer = new FileWriter(JSON_FILE, true)) {
-            writer.append(agentData.toJson()).append("\n");
+        String newLine = "-";
+        if (bestAgents.size() < 2 || 
+                !bestAgents.subList(bestAgents.size() - 2, bestAgents.size()).contains(agent.getAgentId())) {
+            bestAgents.add(agent.getAgentId());
+            AgentData agentData = new AgentData(agent.getAgentId(), agent.getFitness(), agent.getChromosome());
+            newLine = agentData.toJson() + "\n";
+        }
+
+        try (FileWriter writer = new FileWriter(jsonFileName, true)) {
+            writer.append(newLine);
         } catch (IOException e) {
             e.printStackTrace();
             // Handle the exception according to your application's requirements
         }
     }
 
-    public static List<AgentData> readDataFromJsonFile(String filename) {
+    public List<AgentData> readChromosome(String filename) {
         List<AgentData> agentDataList = new ArrayList<>();
         Gson gson = new Gson();
         Type agentDataType = new TypeToken<AgentData>() {}.getType();
@@ -81,12 +100,14 @@ public class Logger {
         try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                AgentData agentData = gson.fromJson(line, agentDataType);
-                // Skip duplicates
-                if (!agentDataList.isEmpty() && agentDataList.getLast().agentName.equals(agentData.agentName)) {
-                    continue;
+                try {
+                    if (line.isEmpty()) continue;
+                    AgentData agentData = gson.fromJson(line, agentDataType);
+                    if (agentData == null) continue;
+                    agentDataList.add(agentData);
+                    bestAgents.add(agentData.agentName);
+                } catch (Exception ignored) {
                 }
-                agentDataList.add(agentData);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -105,9 +126,9 @@ public class Logger {
         logCSV(BESTFIT_FILE, data.toString());
     }
     
-    public static List<Agent> loadAgents(int size){
+    public List<Agent> loadAgents(int size){
         List<Agent> agents = new ArrayList<>();
-        List<AgentData> agentDataList = readDataFromJsonFile(JSON_FILE);
+        List<AgentData> agentDataList = readChromosome(jsonFileName);
         for (AgentData agentData : agentDataList) {
             Agent agent = new Agent(agentData.data);
             int generation = Integer.parseInt(agentData.agentName.substring(0, agentData.agentName.indexOf("-")));

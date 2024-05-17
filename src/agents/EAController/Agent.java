@@ -16,7 +16,7 @@ public class Agent extends Individual implements MarioAgent {
     
     public int generation = 0;
     public int index = 0;
-    public Agent[] parents = new Agent[2];
+    public String[] parents = new String[2];
 
     public Agent(){
         this.network = new FeedForwardNetwork(Config.LAYER_NODES, 
@@ -46,14 +46,6 @@ public class Agent extends Individual implements MarioAgent {
     
     @Override
     public boolean[] getActions(MarioForwardModel model, MarioTimer timer) {
-/*        int[][] array = new int[16][16];
-
-        for (int r = 1; r <= 16; r++) {
-            for (int c = 1; c <= 16; c++) {
-                array[r - 1][c - 1] = c * 100 + r;
-            }
-        }*/
-        
         int[][] map = model.getMarioSceneObservation(2);
         int[] marioPos = model.getMarioScreenTilePos();
         double[] inputs = getInputs(map, marioPos);
@@ -85,7 +77,10 @@ public class Agent extends Individual implements MarioAgent {
     public void init(int generation, int index, Agent[] parents) {
         this.generation = generation;
         this.index = index;
-        this.parents = parents;
+        if (parents != null) {
+            this.parents[0] = parents[0] == null ? "null" : parents[0].getAgentId();
+            this.parents[1] = parents[1] == null ? "null" : parents[1].getAgentId();
+        }
     }
     
     @Override

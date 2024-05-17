@@ -31,13 +31,12 @@ public class Evolution {
     public void run() {
         Config.rand = new Random(Config.RANDOM_SEED);
         
-        boolean loadData = false;
-        
         // population
-        if (loadData) {
-            var agents = Logger.loadAgents(Config.POPULATION_SIZE);
+        if (!Config.LOAD_DATA_PATH.equals("")) {
+            var agents = Logger.getInstance().loadAgents(Config.POPULATION_SIZE);
             if (!agents.isEmpty()) {
                 population = new Population(agents);
+                printPopulation(0);
             } else {
                 population = new Population();
             }
@@ -89,22 +88,25 @@ public class Evolution {
     }
 
     public void runAgents(List<Agent> agents) {
-        boolean visual = false;
         for (Agent agent : agents) {
             // run 1-1 only
-/*            MarioResult result = PlayLevel.runLevel(agent, Config.LEVEL_STRING, visual);
-            double percentage = result.getCompletionPercentage();
-            double remainingTime = result.getRemainingTime();
-            agent.setFitness(percentage * 100 + remainingTime / 1000);*/
-            // run all levels
-            List<MarioResult> result = PlayLevel.runLevels(agent, visual);
-            List<Double> fitnesses = new ArrayList<>();
-            for (MarioResult r : result) {
-                double percentage = r.getCompletionPercentage();
-                double remainingTime = r.getRemainingTime();
-                fitnesses.add(percentage * 100 + remainingTime / 1000);
+            if (!Config.RUN_ALL_LEVELS) {
+                MarioResult result = PlayLevel.runLevel(agent, Config.LEVEL_STRING, Config.VISUALS);
+                double percentage = result.getCompletionPercentage();
+                double remainingTime = result.getRemainingTime();
+                agent.setFitness(percentage * 100 + remainingTime / 1000);
             }
-            agent.setFitness(fitnesses.stream().mapToDouble(Double::doubleValue).average().orElse(0));
+            else {
+                // run all levels
+                List<MarioResult> result = PlayLevel.runLevels(agent, Config.VISUALS);
+                List<Double> fitnesses = new ArrayList<>();
+                for (MarioResult r : result) {
+                    double percentage = r.getCompletionPercentage();
+                    double remainingTime = r.getRemainingTime();
+                    fitnesses.add(percentage * 100 + remainingTime / 1000);
+                }
+                agent.setFitness(fitnesses.stream().mapToDouble(Double::doubleValue).average().orElse(0));
+            }
         }
     }
 
