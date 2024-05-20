@@ -86,10 +86,10 @@ public class PlayLevel {
 
     public static void main(String[] args) {
         
-        var agent = new agents.predict.Agent(); // Change this to your own agent
+        var agent = new agents.inGame.Agent(); // Change this to your own agent
         
-        // MarioResult result = runLevel(agent, "1-1");
-        // printResults(result);
-        runLevels(agent, true);
+        MarioResult result = runLevel(agent, "1-1", true);
+        printResults(result);
+        // runLevels(agent, true);
     }
 }
