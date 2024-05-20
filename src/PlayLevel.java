@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import agents.inGame.Agent;
 import engine.core.MarioAgent;
 import engine.core.MarioGame;
 import engine.core.MarioResult;
@@ -76,10 +77,10 @@ public class PlayLevel {
 
         MarioGame game = new MarioGame();
         MarioResult result;
-        result = game.runGame(agent, getLevel(level), 20, 0, visual, visual ? 30 : 1000);
+        result = game.runGame(agent, getLevel(level), 30, 0, visual, visual ? 60 : 1000);
         game.CloseWindow();
         String levelName = level.substring(level.lastIndexOf("-") - 1, level.lastIndexOf(".")).replace("-", ".");
-        Logger.getInstance().logLevelResult(result, levelName);
+        // Logger.getInstance().logLevelResult(result, levelName);
         // printResults(result);
         return result;
     }
@@ -90,6 +91,7 @@ public class PlayLevel {
         
         MarioResult result = runLevel(agent, "1-1", true);
         printResults(result);
+        agents.inGame.Logger.getInstance().logLevelResult(result, "1-1");
         // runLevels(agent, true);
     }
 }

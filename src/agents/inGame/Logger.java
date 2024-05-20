@@ -1,6 +1,5 @@
 package agents.inGame;
 
-import agents.EAController.Config;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -41,7 +40,7 @@ public class Logger {
         return instance;
     }
 
-    public class IndividualData {
+    public static class IndividualData {
         public String name;
         public float fitness;
         public int[] chromosome;
@@ -74,6 +73,7 @@ public class Logger {
         Gson gson = new Gson();
         Type individualType = new TypeToken<IndividualData>() {}.getType();
 
+        int counter = 0;
         try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
             String line;
             while ((line = reader.readLine()) != null) {
@@ -83,9 +83,10 @@ public class Logger {
                     if (data == null) continue;
                     Individual individual = new Individual(data.chromosome);
                     String name = data.name;
-                    int generation = Integer.parseInt(name.substring(0, name.indexOf("-")));
-                    int id = Integer.parseInt(name.substring(name.indexOf("-") + 1));
-                    individual.init(generation, id, new String[]{});
+//                    int generation = Integer.parseInt(name.substring(0, name.indexOf("-")));
+//                    int id = Integer.parseInt(name.substring(name.indexOf("-") + 1));
+//                    individual.init(generation, id, new String[]{});
+                    individual.init(0, counter++, null);
                     individualList.add(individual);
                     bestAgents.add(individual.getName());
                 } catch (Exception ignored) {

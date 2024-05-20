@@ -1,9 +1,5 @@
 public static final int[] INPUT_DIMENSIONS = {5, 8, 10}; // (start_row, width, height) where width and height are in number of tiles
 public static final int[] OUTPUT_ACTIONS = {
-/*            MarioActions.LEFT.getValue(), 
-            MarioActions.RIGHT.getValue(),
-            MarioActions.DOWN.getValue(),
-            MarioActions.SPEED.getValue(),*/
 MarioActions.JUMP.getValue()}; // Actions to be taken by the agent
 public static final List<Integer> LAYER_NODES = List.of(INPUT_DIMENSIONS[1] * INPUT_DIMENSIONS[2], 2, OUTPUT_ACTIONS.length);
 

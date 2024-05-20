@@ -17,6 +17,8 @@ public class Agent implements MarioAgent {
     public void initialize(MarioForwardModel model, MarioTimer timer) {
         Config.rand = new Random(Config.RANDOM_SEED);
         actions = new boolean[MarioActions.numberOfActions()];
+        actions[MarioActions.SPEED.getValue()] = true;
+        actions[MarioActions.RIGHT.getValue()] = true;
         population = new ArrayList<>();
         if (Config.LOAD_DATA_PATH.equals("")) {
             populate();
@@ -36,18 +38,25 @@ public class Agent implements MarioAgent {
 
     @Override
     public boolean[] getActions(MarioForwardModel model, MarioTimer timer) {
-        if (population.isEmpty()) {
-        }
-
+        generation++;
+        boolean[] actionCache = actions.clone();
+        
         List<Individual> offspring = crossover(population);
         mutate(offspring);
+        setUp(offspring, model);
+        passAway();
         population.addAll(offspring);
         population = select(population);
         Individual best = population.getFirst();
-        actions = best.getActions(0);
         Logger.getInstance().logIndividual(best); // 
+        actions = best.nextActions(generation);
+        log(best);
+
+        // if Mario is on the ground and the jump action is enabled, disable it
+        if (model.isMarioOnGround() && actionCache[MarioActions.JUMP.getValue()]) {
+            actions[MarioActions.JUMP.getValue()] = false;
+        }
         
-        generation++;
         return actions;
     }
     
@@ -92,8 +101,31 @@ public class Agent implements MarioAgent {
         return population;
     }
     
+    public void passAway(){
+        for (int i = population.size() - 1; i >= 0; i--) {
+            if (population.get(i).getGeneration() <= generation - Config.LENGTH) {
+                population.remove(i);
+            }
+        }
+    }
+    
     public void sort(){
         population.sort((a, b) -> Double.compare(b.getFitness(), a.getFitness()));
+    }
+    
+    public void log(Individual individual){
+        StringBuilder sb = new StringBuilder();
+        sb.append(" | G: ").append(generation);
+        sb.append(" | I: ").append(individual.getName());
+        sb.append(" | F: ").append(individual.getFitness());
+        sb.append(" | Actions: ");
+        var actions = individual.getActions(0);
+        for (int i = 0; i < actions.length; i++) {
+            if (actions[i]) {
+                sb.append(MarioActions.values()[i].toString()).append(" ");
+            }
+        }
+        System.out.println(sb.toString());
     }
     
     @Override
