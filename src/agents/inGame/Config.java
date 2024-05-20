@@ -9,10 +9,10 @@ import java.util.Random;
 
 public class Config {
     public static final int[] ACTIONS = {
-            // MarioActions.DOWN.getValue(),
-            // MarioActions.SPEED.getValue(),
-            // MarioActions.LEFT.getValue(), 
-            // MarioActions.RIGHT.getValue(),
+            MarioActions.DOWN.getValue(),
+            MarioActions.SPEED.getValue(),
+            MarioActions.LEFT.getValue(), 
+            MarioActions.RIGHT.getValue(),
             MarioActions.JUMP.getValue()};
     public static final boolean[] DEFAULT_ACTIONS = {false,true,false,true,false};
     public static final int LENGTH = 10;
@@ -38,7 +38,7 @@ public class Config {
     
     public static final boolean VISUALS = true;
     public static final boolean RUN_ALL_LEVELS = false;
-    public static final String LOAD_DATA_PATH = "log/520-2.json";
+    public static final String LOAD_DATA_PATH = "log/520-4.json";
     
     public static final int FLOOR_Y = 207;
 }

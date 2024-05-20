@@ -14,7 +14,7 @@ import java.util.List;
 public class Logger {
     private static Logger instance;
     private static final String LEVEL_FILE = "log/LevelLogs.csv";
-    private static final String LEVEL_HEADER = "Level,GameStatus,CompletionPercentage,RemainingTime,MarioMode,KillsTotal,KillsByFire,KillsByStomp,KillsByShell,MarioNumHurts,NumBumpQuestionBlock,NumBumpBrick,KillsByFall,NumJumps,MaxXJump,MaxJumpAirTime,CurrentLives,CurrentCoins,NumCollectedMushrooms,NumCollectedFireflower,NumCollectedTileCoins,NumDestroyedBricks,GameEvents,AgentEvents";
+    private static final String LEVEL_HEADER = "Level,JsonFileName,GameStatus,CompletionPercentage,RemainingTime,MarioMode,KillsTotal,KillsByFire,KillsByStomp,KillsByShell,MarioNumHurts,NumBumpQuestionBlock,NumBumpBrick,KillsByFall,NumJumps,MaxXJump,MaxJumpAirTime,CurrentLives,CurrentCoins,NumCollectedMushrooms,NumCollectedFireflower,NumCollectedTileCoins,NumDestroyedBricks,GameEvents,AgentEvents";
     
     private static String jsonFileName = "log/InGame.json";
     private List<String> bestAgents;
@@ -112,7 +112,7 @@ public class Logger {
     
     public void logLevelResult(MarioResult result, String level) {
         String data = getResultAsCSVLine(result);
-        logCSV(LEVEL_FILE, data);
+        logCSV(LEVEL_FILE, level + "," + jsonFileName + "," + data);
     }
 
     private String getResultAsCSVLine(MarioResult result) {

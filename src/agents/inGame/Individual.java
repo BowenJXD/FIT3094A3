@@ -39,7 +39,7 @@ public class Individual {
     public void calculateFitness(){
         Map<Config.ScoreType, Float> scoreMap = new EnumMap<>(Config.ScoreType.class);
         scoreMap.put(Config.ScoreType.Win, (float) (model.getGameStatus() == GameStatus.WIN 
-                ? Config.SCORE[Config.ScoreType.Win.ordinal()] - model.getRemainingTime() : 0));
+                ? Config.SCORE[Config.ScoreType.Win.ordinal()] + model.getRemainingTime() : 0));
         scoreMap.put(Config.ScoreType.Death, (float) ((
                         model.getGameStatus() == GameStatus.LOSE ||
                         model.getMarioFloatPos()[1] > Config.FLOOR_Y) 

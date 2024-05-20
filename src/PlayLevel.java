@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Objects;
 
 import agents.inGame.Agent;
+import agents.inGame.Config;
 import engine.core.MarioAgent;
 import engine.core.MarioGame;
 import engine.core.MarioResult;
@@ -56,11 +57,11 @@ public class PlayLevel {
         MarioGame game = new MarioGame();
         List<MarioResult> results = new ArrayList<>();
         for (String level : levels) {
-            MarioResult result = game.runGame(agent, getLevel(level), 20, 0, visual, visual ? 30 : 1000);
+            MarioResult result = game.runGame(agent, getLevel(level), 20, 0, visual, visual ? 60 : 1000);
             results.add(result);
             game.CloseWindow();
             String levelName = level.substring(level.lastIndexOf("-") - 1, level.lastIndexOf(".")).replace("-", ".");
-            Logger.getInstance().logLevelResult(result, levelName);
+            agents.inGame.Logger.getInstance().logLevelResult(result, levelName);
             // printResults(result);
         }
         return results;
@@ -89,9 +90,13 @@ public class PlayLevel {
         
         var agent = new agents.inGame.Agent(); // Change this to your own agent
         
-        MarioResult result = runLevel(agent, "1-1", true);
-        printResults(result);
-        agents.inGame.Logger.getInstance().logLevelResult(result, "1-1");
-        // runLevels(agent, true);
+        if (Config.RUN_ALL_LEVELS){
+            runLevels(agent, Config.VISUALS);
+        }
+        else {
+            MarioResult result = runLevel(agent, Config.LEVEL_STRING, Config.VISUALS);
+            printResults(result);
+            agents.inGame.Logger.getInstance().logLevelResult(result, "1-1");
+        }
     }
 }
