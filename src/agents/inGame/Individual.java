@@ -1,32 +1,32 @@
 package agents.inGame;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import engine.core.MarioForwardModel;
 import engine.helper.GameStatus;
-import engine.helper.MarioActions;
 
-import java.util.Arrays;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-public class Individual {
+public abstract class Individual {
     protected int generation;
     protected int index;
     protected String[] parents = new String[2];
     
     protected float fitness;
-    protected int[] chromosome = new int[Config.LENGTH];
     protected MarioForwardModel model;
+    protected Random rand;
 
     public Individual() {
-        
+        rand = Config.rand;
     }
-    
-    public Individual(int[] chromosome){
-        this.chromosome = chromosome;
-    }
+
+    public abstract boolean[] getActions(int index);
+
+    public abstract void generate();
+
+    public abstract Individual[] crossover(Individual otherIndividual);
+
+    public abstract void mutate();
+
+    public abstract String logGene();
     
     public void advanceModel(MarioForwardModel newModel){
         model = newModel.clone();
@@ -46,15 +46,6 @@ public class Individual {
                 ? Config.SCORE[Config.ScoreType.Death.ordinal()] : 0));
         scoreMap.put(Config.ScoreType.X, model.getMarioFloatPos()[0] * Config.SCORE[Config.ScoreType.X.ordinal()]);
         fitness = scoreMap.values().stream().reduce(0f, Float::sum);
-    }
-    
-    public boolean[] getActions(int index){
-        boolean[] actions = Config.DEFAULT_ACTIONS.clone();
-        var partialActions = intToBooleanArray(chromosome[index], Config.ACTIONS.length);
-        for (int i = 0; i < partialActions.length; i++) {
-            actions[Config.ACTIONS[i]] = partialActions[i];
-        }
-        return actions;
     }
     
     public boolean[] nextActions(int currentGeneration){
@@ -77,32 +68,13 @@ public class Individual {
                 ", index=" + index +
                 ", parents=" + Arrays.toString(parents) +
                 ", fitness=" + fitness +
-                ", chromosome=" + Arrays.toString(chromosome) +
+                ", gene=" + logGene() +
                 '}';
     }
 
     public float getFitness() { return fitness; }
     public void setFitness(float fitness) { this.fitness = fitness; }
-    public int[] getChromosome() { return chromosome; }
-    public void setChromosome(int[] chromosome) { this.chromosome = chromosome; }
     public void setModel(MarioForwardModel model) { this.model = model; }
     public MarioForwardModel getModel() { return model; }
     public int getGeneration() { return generation; }
-
-    public static boolean[] intToBooleanArray(int num, int length) {
-        boolean[] boolArray = new boolean[length];
-        String binary = Integer.toBinaryString(num);
-
-        // Pad the binary string with leading zeros if necessary
-        while (binary.length() < length) {
-            binary = "0" + binary;
-        }
-
-        // Convert the binary string to a boolean array
-        for (int i = 0; i < length; i++) {
-            boolArray[i] = binary.charAt(i) == '1';
-        }
-
-        return boolArray;
-    }
 }

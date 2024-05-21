@@ -43,7 +43,7 @@ public class Logger {
     public static class IndividualData {
         public String name;
         public float fitness;
-        public int[] chromosome;
+        public String chromosome;
     }
     
     public void logIndividual(Individual individual) {
@@ -55,7 +55,7 @@ public class Logger {
             IndividualData data = new IndividualData();
             data.name = individual.getName();
             data.fitness = individual.getFitness();
-            data.chromosome = individual.getChromosome();
+            data.chromosome = individual.logGene();
             Gson gson = new GsonBuilder().create();
             newLine = gson.toJson(data) + "\n";
         }
@@ -81,8 +81,13 @@ public class Logger {
                     if (line.isEmpty()) continue;
                     IndividualData data = gson.fromJson(line, individualType);
                     if (data == null) continue;
-                    Individual individual = new Individual(data.chromosome);
-                    String name = data.name;
+                    Individual individual;
+                    if (Config.INDIVIDUAL_CLASS == "UniformIndividual") {
+                        individual = new UniformIndividual(data.chromosome);
+                    } else if (Config.INDIVIDUAL_CLASS == "CosIndividual") {
+                        individual = new CosIndividual(data.chromosome);
+                    }
+//                    String name = data.name;
 //                    int generation = Integer.parseInt(name.substring(0, name.indexOf("-")));
 //                    int id = Integer.parseInt(name.substring(name.indexOf("-") + 1));
 //                    individual.init(generation, id, new String[]{});

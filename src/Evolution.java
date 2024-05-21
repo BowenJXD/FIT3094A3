@@ -53,7 +53,7 @@ public class Evolution {
             printPopulation(g);
             Logger.getInstance().logChromosome(parents.getFirst());
             
-            // Crossover and mutation
+            // crossover and mutation
             List<Agent> offspring = new ArrayList<>();
             for (int i = 0; i < parents.size(); i += 2) {
                 Agent parent1 = parents.get(i);

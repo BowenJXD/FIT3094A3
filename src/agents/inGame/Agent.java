@@ -61,13 +61,14 @@ public class Agent implements MarioAgent {
     }
     
     public void populate(){
-        Random rand = Config.rand;
         for (int i = 0; i < Config.POPULATION_SIZE; i++) {
-            int[] chromosome = new int[Config.LENGTH];
-            for (int j = 0; j < Config.LENGTH; j++) {
-                chromosome[j] = rand.nextInt(Config.WIDTH);
+            Individual individual = null;
+            if (Config.INDIVIDUAL_CLASS.equals("UniformIndividual")) {
+                individual = new UniformIndividual();
             }
-            Individual individual = new Individual(chromosome);
+            else if (Config.INDIVIDUAL_CLASS.equals("CosIndividual")) {
+                individual = new CosIndividual();
+            }
             individual.init(generation, i, new String[]{});
             population.add(individual);
         }
@@ -78,20 +79,18 @@ public class Agent implements MarioAgent {
         for (int i = 0; i < parent.size(); i += 2) {
             Individual parent1 = parent.get(i);
             Individual parent2 = parent.get(i + 1);
-            int[][] offspringChromosomes = Crossover.uniformBinaryCrossover(parent1.getChromosome(), parent2.getChromosome());
-            Individual offspring1 = new Individual(offspringChromosomes[0]);
-            Individual offspring2 = new Individual(offspringChromosomes[1]);
-            offspring1.init(generation, i, new String[]{parent1.getName(), parent2.getName()});
-            offspring2.init(generation, i + 1, new String[]{parent2.getName(), parent1.getName()});
-            offspring.add(offspring1);
-            offspring.add(offspring2);
+            Individual[] offsprings = parent1.crossover(parent2);
+            for (int j = 0; j < offsprings.length; j++) {
+                offsprings[j].init(generation, i + j, new String[]{parent1.getName(), parent2.getName()});
+                offspring.add(offsprings[j]);
+            }
         }
         return offspring;
     }
     
     public List<Individual> mutate(List<Individual> population){
         for (Individual individual : population) {
-            Mutation.randomUniformMutation(individual.getChromosome(), Config.MUTATION_PROBABILITY, 0, Config.WIDTH);
+            individual.mutate();
         }
         return population;
     }
