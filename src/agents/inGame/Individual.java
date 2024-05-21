@@ -13,6 +13,7 @@ public abstract class Individual {
     protected float fitness;
     protected MarioForwardModel model;
     protected Random rand;
+    protected PopulationConfig config;
 
     public Individual() {
         rand = Config.rand;
@@ -30,7 +31,7 @@ public abstract class Individual {
     
     public void advanceModel(MarioForwardModel newModel){
         model = newModel.clone();
-        for (int i = 0; i < Config.LENGTH; i++) {
+        for (int i = 0; i < config.LENGTH; i++) {
             if (model.getGameStatus() != GameStatus.RUNNING) return;
             model.advance(getActions(i));
         }
@@ -39,12 +40,12 @@ public abstract class Individual {
     public void calculateFitness(){
         Map<Config.ScoreType, Float> scoreMap = new EnumMap<>(Config.ScoreType.class);
         scoreMap.put(Config.ScoreType.Win, (float) (model.getGameStatus() == GameStatus.WIN 
-                ? Config.SCORE[Config.ScoreType.Win.ordinal()] + model.getRemainingTime() : 0));
+                ? config.SCORE[Config.ScoreType.Win.ordinal()] + model.getRemainingTime() : 0));
         scoreMap.put(Config.ScoreType.Death, (float) ((
                         model.getGameStatus() == GameStatus.LOSE ||
                         model.getMarioFloatPos()[1] > Config.FLOOR_Y) 
-                ? Config.SCORE[Config.ScoreType.Death.ordinal()] : 0));
-        scoreMap.put(Config.ScoreType.X, model.getMarioFloatPos()[0] * Config.SCORE[Config.ScoreType.X.ordinal()]);
+                ? config.SCORE[Config.ScoreType.Death.ordinal()] : 0));
+        scoreMap.put(Config.ScoreType.X, model.getMarioFloatPos()[0] * config.SCORE[Config.ScoreType.X.ordinal()]);
         fitness = scoreMap.values().stream().reduce(0f, Float::sum);
     }
     
@@ -77,4 +78,6 @@ public abstract class Individual {
     public void setModel(MarioForwardModel model) { this.model = model; }
     public MarioForwardModel getModel() { return model; }
     public int getGeneration() { return generation; }
+    public PopulationConfig getConfig() { return config; }
+    public void setConfig(PopulationConfig config) { this.config = config; }
 }

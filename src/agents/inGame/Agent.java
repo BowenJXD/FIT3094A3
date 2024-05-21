@@ -11,7 +11,7 @@ public class Agent implements MarioAgent {
     private boolean[] actions = null;
     
     public int generation = 0;
-    private List<Individual> population;
+    private Population[] populations = new Population[Config.NUM_POPULATION];
 
     @Override
     public void initialize(MarioForwardModel model, MarioTimer timer) {
@@ -19,20 +19,19 @@ public class Agent implements MarioAgent {
         actions = new boolean[MarioActions.numberOfActions()];
         actions[MarioActions.SPEED.getValue()] = true;
         actions[MarioActions.RIGHT.getValue()] = true;
-        population = new ArrayList<>();
-        if (Config.LOAD_DATA_PATH.equals("")) {
-            populate();
-        }
-        else {
-            population = Logger.getInstance().loadPopulation(Config.POPULATION_SIZE); // 
-        }
-        setUp(population, model);
-    }
-
-    private void setUp(List<Individual> population, MarioForwardModel model) {
-        for (Individual individual : population) {
-            individual.advanceModel(model);
-            individual.calculateFitness();
+        for (int i = 0; i < Config.NUM_POPULATION; i++) {
+            Population pop = new Population();
+            var config = pop.getConfig();
+            config.VARIABLES.replace('p', new float[]{(float) (1 + i * 0.1), (float) (1 + i * 0.1), 0.2f});
+            pop.setConfig(config);
+            populations[i] = new Population();
+            if (Config.LOAD_DATA_PATH.equals("")) {
+                populations[i].populate(generation);
+            }
+//        else {
+//            population = Logger.getInstance().loadPopulation(Config.POPULATION_SIZE); // 
+//        }
+            populations[i].setUp(populations[i].getIndividuals(), model);
         }
     }
 
@@ -41,13 +40,13 @@ public class Agent implements MarioAgent {
         generation++;
         boolean[] actionCache = actions.clone();
         
-        List<Individual> offspring = crossover(population);
-        mutate(offspring);
-        setUp(offspring, model);
-        passAway();
-        population.addAll(offspring);
-        population = select(population);
-        Individual best = population.getFirst();
+        List<Individual> individuals = new ArrayList<>();
+        for (int i = 0; i < Config.NUM_POPULATION; i++) {
+            populations[i].evolve(model);
+            individuals.addAll(populations[i].getIndividuals());
+        }
+        individuals.sort(Comparator.comparing(Individual::getFitness).reversed());
+        Individual best = individuals.getFirst();
         Logger.getInstance().logIndividual(best); // 
         actions = best.nextActions(generation);
         log(best);
@@ -58,58 +57,6 @@ public class Agent implements MarioAgent {
         }
         
         return actions;
-    }
-    
-    public void populate(){
-        for (int i = 0; i < Config.POPULATION_SIZE; i++) {
-            Individual individual = null;
-            if (Config.INDIVIDUAL_CLASS.equals("UniformIndividual")) {
-                individual = new UniformIndividual();
-            }
-            else if (Config.INDIVIDUAL_CLASS.equals("CosIndividual")) {
-                individual = new CosIndividual();
-            }
-            individual.init(generation, i, new String[]{});
-            population.add(individual);
-        }
-    }
-    
-    public List<Individual> crossover(List<Individual> parent){
-        List<Individual> offspring = new ArrayList<>();
-        for (int i = 0; i < parent.size(); i += 2) {
-            Individual parent1 = parent.get(i);
-            Individual parent2 = parent.get(i + 1);
-            Individual[] offsprings = parent1.crossover(parent2);
-            for (int j = 0; j < offsprings.length; j++) {
-                offsprings[j].init(generation, i + j, new String[]{parent1.getName(), parent2.getName()});
-                offspring.add(offsprings[j]);
-            }
-        }
-        return offspring;
-    }
-    
-    public List<Individual> mutate(List<Individual> population){
-        for (Individual individual : population) {
-            individual.mutate();
-        }
-        return population;
-    }
-    
-    public List<Individual> select(List<Individual> population){
-        population = Selection.tournamentSelection(population, Config.POPULATION_SIZE);
-        return population;
-    }
-    
-    public void passAway(){
-        for (int i = population.size() - 1; i >= 0; i--) {
-            if (population.get(i).getGeneration() <= generation - Config.LENGTH) {
-                population.remove(i);
-            }
-        }
-    }
-    
-    public void sort(){
-        population.sort((a, b) -> Double.compare(b.getFitness(), a.getFitness()));
     }
     
     public void log(Individual individual){

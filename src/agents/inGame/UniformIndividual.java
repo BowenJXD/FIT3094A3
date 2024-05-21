@@ -9,9 +9,11 @@ import java.util.EnumMap;
 import java.util.Map;
 
 public class UniformIndividual extends Individual {
-    protected int[] chromosome = new int[Config.LENGTH];
+    protected int[] chromosome;
     
-    public UniformIndividual(){
+    public UniformIndividual(PopulationConfig config){
+        chromosome = new int[config.LENGTH];
+        this.config = config;
         generate();
     }
     
@@ -26,10 +28,10 @@ public class UniformIndividual extends Individual {
     
     @Override
     public boolean[] getActions(int index){
-        boolean[] actions = Config.DEFAULT_ACTIONS.clone();
-        var partialActions = intToBooleanArray(chromosome[index], Config.ACTIONS.length);
+        boolean[] actions = config.DEFAULT_ACTIONS.clone();
+        var partialActions = intToBooleanArray(chromosome[index], config.ACTIONS.length);
         for (int i = 0; i < partialActions.length; i++) {
-            actions[Config.ACTIONS[i]] = partialActions[i];
+            actions[config.ACTIONS[i]] = partialActions[i];
         }
 
         return actions;
@@ -37,9 +39,9 @@ public class UniformIndividual extends Individual {
 
     @Override
     public void generate() {
-        chromosome = new int[Config.LENGTH];
-        for (int j = 0; j < Config.LENGTH; j++) {
-            chromosome[j] = rand.nextInt(Config.WIDTH);
+        chromosome = new int[config.LENGTH];
+        for (int j = 0; j < config.LENGTH; j++) {
+            chromosome[j] = rand.nextInt(config.WIDTH());
         }
     }
 
@@ -63,8 +65,8 @@ public class UniformIndividual extends Individual {
     @Override
     public void mutate() {
         for (int i = 0; i < chromosome.length; i++) {
-            if (rand.nextDouble() < Config.MUTATION_PROBABILITY) {
-                chromosome[i] = rand.nextInt(Config.WIDTH);
+            if (rand.nextDouble() < config.MUTATION_PROBABILITY) {
+                chromosome[i] = rand.nextInt(config.WIDTH());
             }
         }
     }
