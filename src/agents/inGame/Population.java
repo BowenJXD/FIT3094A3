@@ -8,6 +8,7 @@ import java.util.List;
 public class Population {
     protected List<Individual> individuals = new ArrayList<>();
     protected int generation = 0;
+    protected int step = 0;
     protected PopulationConfig config = new PopulationConfig();
 
     public Population() {
@@ -17,7 +18,8 @@ public class Population {
         this.individuals = agents;
     }
     
-    public void populate(int generation){
+    public void populate(int step){
+        this.step = step;
         for (int i = 0; i < config.POPULATION_SIZE; i++) {
             Individual individual = null;
             if (config.INDIVIDUAL_CLASS.equals("UniformIndividual")) {
@@ -26,7 +28,7 @@ public class Population {
             else if (config.INDIVIDUAL_CLASS.equals("CosIndividual")) {
                 individual = new CosIndividual(config);
             }
-            individual.init(generation, i, new String[]{});
+            individual.init(step, generation, i, new String[]{});
             individual.setConfig(config);
             individuals.add(individual);
         }
@@ -53,7 +55,7 @@ public class Population {
             Individual parent2 = parent.get(i + 1);
             Individual[] offsprings = parent1.crossover(parent2);
             for (int j = 0; j < offsprings.length; j++) {
-                offsprings[j].init(generation, i + j, new String[]{parent1.getName(), parent2.getName()});
+                offsprings[j].init(step, generation, i + j, new String[]{parent1.getName(), parent2.getName()});
                 offsprings[j].setConfig(config);
                 offspring.add(offsprings[j]);
             }

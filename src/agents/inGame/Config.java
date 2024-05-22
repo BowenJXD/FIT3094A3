@@ -46,9 +46,9 @@ public class Config {
     public static final int RANDOM_SEED = 42;
     public static Random rand = new Random(RANDOM_SEED);
 
-    public static final String LEVEL_STRING = "3-1";
+    public static final String LEVEL_STRING = "5-3";
     public static final boolean VISUALS = true;
-    public static final boolean RUN_ALL_LEVELS = false;
+    public static final boolean RUN_ALL_LEVELS = true;
     public static final String LOAD_DATA_PATH = "";
     
     public static final int FLOOR_Y = 207;

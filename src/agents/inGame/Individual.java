@@ -6,6 +6,7 @@ import engine.helper.GameStatus;
 import java.util.*;
 
 public abstract class Individual {
+    protected int step;
     protected int generation;
     protected int index;
     protected String[] parents = new String[2];
@@ -53,26 +54,28 @@ public abstract class Individual {
                         model.getMarioFloatPos()[1] > Config.FLOOR_Y) 
                 ? config.SCORE[Config.ScoreType.Death.ordinal()] : 0));
         scoreMap.put(Config.ScoreType.X, (maxX - initX) * config.SCORE[Config.ScoreType.X.ordinal()]);
-        scoreMap.put(Config.ScoreType.Y, (300 - minY) * config.SCORE[Config.ScoreType.Y.ordinal()]);
+        scoreMap.put(Config.ScoreType.Y, (model.getLevelFloatDimensions()[1] - minY) * config.SCORE[Config.ScoreType.Y.ordinal()]);
         fitness = scoreMap.values().stream().reduce(0f, Float::sum);
     }
     
-    public boolean[] nextActions(int currentGeneration){
-        return getActions(currentGeneration - generation);
+    public boolean[] nextActions(int currentStep){
+        return getActions(currentStep - step);
     }
 
-    public void init(int generation, int index, String[] parents){
+    public void init(int step, int generation, int index, String[] parents){
+        this.step = step;
         this.generation = generation;
         this.index = index;
         this.parents = parents;
     }
     
     public String getName(){
-        return generation + "-" + index;
+        return step + "-" + generation + "-" + index;
     }
     
     public String printInfo() {
         return "Individual{" +
+                "step=" + step +
                 "generation=" + generation +
                 ", index=" + index +
                 ", parents=" + Arrays.toString(parents) +

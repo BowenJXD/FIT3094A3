@@ -91,7 +91,7 @@ public class Logger {
 //                    int generation = Integer.parseInt(name.substring(0, name.indexOf("-")));
 //                    int id = Integer.parseInt(name.substring(name.indexOf("-") + 1));
 //                    individual.init(generation, id, new String[]{});
-                    individual.init(0, counter++, null);
+                    individual.init(0, 0, counter++, null);
                     individualList.add(individual);
                     bestAgents.add(individual.getName());
                 } catch (Exception ignored) {
