@@ -21,10 +21,10 @@ public class Config {
 //            MarioActions.DOWN.getValue(),
 //            MarioActions.SPEED.getValue(),
             MarioActions.LEFT.getValue(), 
-            MarioActions.RIGHT.getValue(),
+//            MarioActions.RIGHT.getValue(),
             MarioActions.JUMP.getValue()};
     public static final boolean[] DEFAULT_ACTIONS = {false,true,false,true,false};
-    public static final int LENGTH = 40;
+    public static final int LENGTH = 20;
     public static final Map<Character, float[]> VARIABLES = Map.of(
             'a', new float[]{0, 1, 0},
             'h', new float[]{-LENGTH, LENGTH, 0},
@@ -40,15 +40,15 @@ public class Config {
 
     // ------------------------------------------------
 
-    public static final int NUM_POPULATION = 1;
+    public static final int NUM_POPULATION = 2;
     public static final int NUM_GENERATION = 20;
     
     public static final int RANDOM_SEED = 42;
     public static Random rand = new Random(RANDOM_SEED);
 
-    public static final String LEVEL_STRING = "1-1";
+    public static final String LEVEL_STRING = "3-1";
     public static final boolean VISUALS = true;
-    public static final boolean RUN_ALL_LEVELS = true;
+    public static final boolean RUN_ALL_LEVELS = false;
     public static final String LOAD_DATA_PATH = "";
     
     public static final int FLOOR_Y = 207;

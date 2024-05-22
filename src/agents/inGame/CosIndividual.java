@@ -1,6 +1,7 @@
 package agents.inGame;
 
 import com.google.gson.Gson;
+import engine.helper.MarioActions;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -29,20 +30,27 @@ public class CosIndividual extends Individual {
         boolean[] actions = config.DEFAULT_ACTIONS.clone();
         int v = config.VARIABLES.size();
         for (int i = 0; i < config.ACTIONS.length; i++) {
-            actions[config.ACTIONS[i]] = getAction(index, Arrays.copyOfRange(chromosome, i*v, i*v+v));
+            if (config.ACTIONS[i] == MarioActions.LEFT.getValue()) {
+                double left = getAction(index, Arrays.copyOfRange(chromosome, i*v, i*v+v));
+                int j = MarioActions.RIGHT.getValue();
+                double right = getAction(index, Arrays.copyOfRange(chromosome, j*v, j*v+v));
+                actions[MarioActions.LEFT.getValue()] = left > right;
+                actions[MarioActions.RIGHT.getValue()] = right > left;
+            }
+            actions[config.ACTIONS[i]] = getAction(index, Arrays.copyOfRange(chromosome, i*v, i*v+v)) > 0;
         }
 
         return actions;
     }
 
-    public boolean getAction(float x, float[] chromosomeOfAction){
+    public double getAction(float x, float[] chromosomeOfAction){
         Map<Character, Float> values = new HashMap<>(Map.of('a', 0f, 'h', 0f, 'k', 0f, 'p', 0f));
         for (int i = 0; i < config.VARIABLES.size(); i++) {
             values.put(config.KEYS[i], chromosomeOfAction[i]);
         }
         float a = values.get('a'), h = values.get('h'), k = values.get('k'), p = values.get('p');
         double y = Math.cos(Math.pow(a * (x + h),p)) + k;
-        return y > 0;
+        return y;
     }
 
     @Override

@@ -78,7 +78,7 @@ public class PlayLevel {
 
         MarioGame game = new MarioGame();
         MarioResult result;
-        result = game.runGame(agent, getLevel(level), 20, 0, visual, visual ? 60 : 1000);
+        result = game.runGame(agent, getLevel(level), 60, 0, visual, visual ? 60 : 1000);
         game.CloseWindow();
         String levelName = level.substring(level.lastIndexOf("-") - 1, level.lastIndexOf(".")).replace("-", ".");
         // Logger.getInstance().logLevelResult(result, levelName);
@@ -96,7 +96,7 @@ public class PlayLevel {
         else {
             MarioResult result = runLevel(agent, Config.LEVEL_STRING, Config.VISUALS);
             printResults(result);
-            agents.inGame.Logger.getInstance().logLevelResult(result, "1-1");
+            agents.inGame.Logger.getInstance().logLevelResult(result, Config.LEVEL_STRING);
         }
     }
 }

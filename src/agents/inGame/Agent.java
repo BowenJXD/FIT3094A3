@@ -42,7 +42,11 @@ public class Agent implements MarioAgent {
 
         List<Individual> individuals = new ArrayList<>();
         for (int i = 0; i < Config.NUM_POPULATION; i++) {
-            populations[i] = new Population();
+            Population pop = new Population();
+            var config = pop.getConfig();
+            config.SCORE = i == 0? new int[]{(int) 1E6, -Integer.MAX_VALUE, 100, 1} : new int[]{(int) 1E6, -Integer.MAX_VALUE, 1, 100};
+            pop.setConfig(config);
+            populations[i] = pop;
             populations[i].populate(generation);
             populations[i].setUp(populations[i].getIndividuals(), model);
             for (int j = 0; j < Config.NUM_GENERATION; j++) {

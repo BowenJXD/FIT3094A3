@@ -14,6 +14,10 @@ public abstract class Individual {
     protected MarioForwardModel model;
     protected Random rand;
     protected PopulationConfig config;
+    
+    protected float initX = 0;
+    protected float maxX = 0;
+    protected float minY = 1000;
 
     public Individual() {
         rand = Config.rand;
@@ -31,9 +35,12 @@ public abstract class Individual {
     
     public void advanceModel(MarioForwardModel newModel){
         model = newModel.clone();
+        initX = model.getMarioFloatPos()[0];
         for (int i = 0; i < config.LENGTH; i++) {
             if (model.getGameStatus() != GameStatus.RUNNING) return;
             model.advance(getActions(i));
+            if (model.getMarioFloatPos()[0] > maxX) maxX = model.getMarioFloatPos()[0];
+            if (model.getMarioFloatPos()[1] < minY) minY = model.getMarioFloatPos()[1];
         }
     }
     
@@ -45,8 +52,8 @@ public abstract class Individual {
                         model.getGameStatus() == GameStatus.LOSE ||
                         model.getMarioFloatPos()[1] > Config.FLOOR_Y) 
                 ? config.SCORE[Config.ScoreType.Death.ordinal()] : 0));
-        scoreMap.put(Config.ScoreType.X, model.getMarioFloatPos()[0] * config.SCORE[Config.ScoreType.X.ordinal()]);
-        scoreMap.put(Config.ScoreType.Y, -model.getMarioFloatPos()[1] * config.SCORE[Config.ScoreType.Y.ordinal()]);
+        scoreMap.put(Config.ScoreType.X, (maxX - initX) * config.SCORE[Config.ScoreType.X.ordinal()]);
+        scoreMap.put(Config.ScoreType.Y, (300 - minY) * config.SCORE[Config.ScoreType.Y.ordinal()]);
         fitness = scoreMap.values().stream().reduce(0f, Float::sum);
     }
     
