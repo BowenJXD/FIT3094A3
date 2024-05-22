@@ -15,7 +15,7 @@ public class MarioGame {
     /**
      * This will be set to true when being assessed for the assignment. Disables the train function and enables real time time-out.
      */
-    private boolean assessedMode = false;
+    private boolean assessedMode = true;
     /**
      * the maximum time that agent takes for each step
      */

@@ -1,4 +1,4 @@
-package agents.inGame;
+package agents.EAController;
 
 import com.google.gson.Gson;
 import engine.helper.MarioActions;

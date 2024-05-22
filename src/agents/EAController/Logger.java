@@ -1,43 +1,27 @@
-package util;
+package agents.EAController;
 
-import agents.EAController.Config;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+import engine.core.MarioResult;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Type;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import agents.EAController.Agent;
-import com.google.gson.reflect.TypeToken;
-import engine.core.MarioEvent;
-import engine.core.MarioAgentEvent;
-import engine.core.MarioResult;
-
-// TODO: allow outputting the statistic of each run
 public class Logger {
     private static Logger instance;
-    private static final String LEVEL_FILE = "log/logs.csv";
-    private static final String LEVEL_HEADER = "Level,GameStatus,CompletionPercentage,RemainingTime,MarioMode,KillsTotal,KillsByFire,KillsByStomp,KillsByShell,MarioNumHurts,NumBumpQuestionBlock,NumBumpBrick,KillsByFall,NumJumps,MaxXJump,MaxJumpAirTime,CurrentLives,CurrentCoins,NumCollectedMushrooms,NumCollectedFireflower,NumCollectedTileCoins,NumDestroyedBricks,GameEvents,AgentEvents";
+    private static final String LEVEL_FILE = "log/LevelLogs.csv";
+    private static final String LEVEL_HEADER = "Level,JsonFileName,GameStatus,CompletionPercentage,RemainingTime,MarioMode,KillsTotal,KillsByFire,KillsByStomp,KillsByShell,MarioNumHurts,NumBumpQuestionBlock,NumBumpBrick,KillsByFall,NumJumps,MaxXJump,MaxJumpAirTime,CurrentLives,CurrentCoins,NumCollectedMushrooms,NumCollectedFireflower,NumCollectedTileCoins,NumDestroyedBricks,GameEvents,AgentEvents";
     
-    private static String jsonFileName = "log/515-before.json";
+    private static String jsonFileName = "log/InGame.json";
     private List<String> bestAgents;
-    
-    private static final String BESTFIT_FILE = "log/bestfits.csv";
-    
-    List<Double> bestfits;
     
     private Logger() {
         // Private constructor to prevent instantiation from outside
         checkAndWriteHeader(LEVEL_FILE, LEVEL_HEADER);
-        bestfits = new ArrayList<>();
         bestAgents = new ArrayList<>();
         // create a new json file to store chromosomes, the name of the file is the datetime now
         if (Config.LOAD_DATA_PATH.equals("")) {
@@ -56,32 +40,24 @@ public class Logger {
         return instance;
     }
 
-    public static class AgentData {
-        public String agentName;
-        public double fitness;
-        public Map<String, double[][]> data;
-
-        public AgentData(String agentName, double fitness, Map<String, double[][]> data) {
-            this.agentName = agentName;
-            this.fitness = fitness;
-            this.data = data;
-        }
-
-        // Serialization method
-        public String toJson() {
-            Gson gson = new GsonBuilder().create();
-            return gson.toJson(this);
-        }
+    public static class IndividualData {
+        public String name;
+        public float fitness;
+        public String chromosome;
     }
-
-    public void logChromosome(Agent agent) {
-        bestfits.add(agent.getFitness());
+    
+    public void logIndividual(Individual individual) {
         String newLine = "-";
         if (bestAgents.size() < 2 || 
-                !bestAgents.subList(bestAgents.size() - 2, bestAgents.size()).contains(agent.getAgentId())) {
-            bestAgents.add(agent.getAgentId());
-            AgentData agentData = new AgentData(agent.getAgentId(), agent.getFitness(), agent.getChromosome());
-            newLine = agentData.toJson() + "\n";
+                !bestAgents.subList(bestAgents.size() - 2, bestAgents.size()).contains(individual.getName())) {
+            bestAgents.add(individual.getName());
+            
+            IndividualData data = new IndividualData();
+            data.name = individual.getName();
+            data.fitness = individual.getFitness();
+            data.chromosome = individual.logGene();
+            Gson gson = new GsonBuilder().create();
+            newLine = gson.toJson(data) + "\n";
         }
 
         try (FileWriter writer = new FileWriter(jsonFileName, true)) {
@@ -92,20 +68,32 @@ public class Logger {
         }
     }
 
-    public List<AgentData> readChromosome(String filename) {
-        List<AgentData> agentDataList = new ArrayList<>();
+    public List<Individual> readIndividual(String filename) {
+        List<Individual> individualList = new ArrayList<>();
         Gson gson = new Gson();
-        Type agentDataType = new TypeToken<AgentData>() {}.getType();
+        Type individualType = new TypeToken<IndividualData>() {}.getType();
 
+        int counter = 0;
         try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 try {
                     if (line.isEmpty()) continue;
-                    AgentData agentData = gson.fromJson(line, agentDataType);
-                    if (agentData == null) continue;
-                    agentDataList.add(agentData);
-                    bestAgents.add(agentData.agentName);
+                    IndividualData data = gson.fromJson(line, individualType);
+                    if (data == null) continue;
+                    Individual individual;
+                    if (Config.INDIVIDUAL_CLASS == "UniformIndividual") {
+                        individual = new UniformIndividual(data.chromosome);
+                    } else if (Config.INDIVIDUAL_CLASS == "CosIndividual") {
+                        individual = new CosIndividual(data.chromosome);
+                    }
+//                    String name = data.name;
+//                    int generation = Integer.parseInt(name.substring(0, name.indexOf("-")));
+//                    int id = Integer.parseInt(name.substring(name.indexOf("-") + 1));
+//                    individual.init(generation, id, new String[]{});
+                    individual.init(0, 0, counter++, null);
+                    individualList.add(individual);
+                    bestAgents.add(individual.getName());
                 } catch (Exception ignored) {
                 }
             }
@@ -114,29 +102,11 @@ public class Logger {
             // Handle the exception according to your application's requirements
         }
 
-        return agentDataList;
+        return individualList;
     }
     
-    public void logBestfits(){
-        StringBuilder data = new StringBuilder();
-        for (Double bestfit : bestfits) {
-            // format to 2 decimal places
-            data.append(String.format("%.2f", bestfit)).append(",");
-        }
-        logCSV(BESTFIT_FILE, data.toString());
-    }
-    
-    public List<Agent> loadAgents(int size){
-        List<Agent> agents = new ArrayList<>();
-        List<AgentData> agentDataList = readChromosome(jsonFileName);
-        for (AgentData agentData : agentDataList) {
-            Agent agent = new Agent(agentData.data);
-            int generation = Integer.parseInt(agentData.agentName.substring(0, agentData.agentName.indexOf("-")));
-            int id = Integer.parseInt(agentData.agentName.substring(agentData.agentName.indexOf("-") + 1));
-            agent.init(generation, id, null);
-            agent.setFitness(agentData.fitness);
-            agents.add(agent);
-        }
+    public List<Individual> loadPopulation(int size){
+        List<Individual> agents = readIndividual(jsonFileName);
         agents.sort((a, b) -> Double.compare(b.getFitness(), a.getFitness()));
         if (agents.size() > size) {
             agents = agents.subList(0, size);
@@ -147,7 +117,7 @@ public class Logger {
     
     public void logLevelResult(MarioResult result, String level) {
         String data = getResultAsCSVLine(result);
-        logCSV(LEVEL_FILE, data);
+        logCSV(LEVEL_FILE, level + "," + jsonFileName + "," + data);
     }
 
     private String getResultAsCSVLine(MarioResult result) {
@@ -175,28 +145,6 @@ public class Logger {
         sb.append(result.getNumDestroyedBricks()).append(",");
         /*sb.append(getGameEventsAsCSV(result.getGameEvents())).append(",");
         sb.append(getAgentEventsAsCSV(result.getAgentEvents()));*/
-        return sb.toString();
-    }
-
-    private String getGameEventsAsCSV(ArrayList<MarioEvent> gameEvents) {
-        StringBuilder sb = new StringBuilder();
-        for (MarioEvent event : gameEvents) {
-            sb.append(event.getEventType()).append(",");
-            sb.append(event.getEventParam()).append(",");
-            sb.append(event.getMarioX()).append(",");
-            sb.append(event.getMarioY()).append(",");
-            sb.append(event.getMarioState()).append(",");
-            sb.append(event.getTime()).append(";");
-        }
-        return sb.toString();
-    }
-
-    private String getAgentEventsAsCSV(ArrayList<MarioAgentEvent> agentEvents) {
-        StringBuilder sb = new StringBuilder();
-        for (MarioAgentEvent event : agentEvents) {
-            sb.append(event.toString()).append(",");
-            sb.append(event.getTime()).append(";");
-        }
         return sb.toString();
     }
 

@@ -1,10 +1,7 @@
-package agents.inGame;
-
-import engine.helper.MarioActions;
+package agents.EAController;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
 public class PopulationConfig {
     public String INDIVIDUAL_CLASS;

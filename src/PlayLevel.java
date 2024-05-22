@@ -5,12 +5,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import agents.inGame.Agent;
-import agents.inGame.Config;
+import agents.EAController.Agent;
+import agents.EAController.Config;
+import agents.EAController.Logger;
 import engine.core.MarioAgent;
 import engine.core.MarioGame;
 import engine.core.MarioResult;
-import util.Logger;
 
 public class PlayLevel {
     public static void printResults(MarioResult result) {
@@ -61,7 +61,7 @@ public class PlayLevel {
             results.add(result);
             game.CloseWindow();
             String levelName = level.substring(level.lastIndexOf("-") - 1, level.lastIndexOf(".")).replace("-", ".");
-            agents.inGame.Logger.getInstance().logLevelResult(result, levelName);
+            Logger.getInstance().logLevelResult(result, levelName);
             // printResults(result);
         }
         return results;
@@ -88,7 +88,7 @@ public class PlayLevel {
 
     public static void main(String[] args) {
         
-        var agent = new agents.inGame.Agent(); // Change this to your own agent
+        var agent = new Agent(); // Change this to your own agent
         
         if (Config.RUN_ALL_LEVELS){
             runLevels(agent, Config.VISUALS);
@@ -96,7 +96,7 @@ public class PlayLevel {
         else {
             MarioResult result = runLevel(agent, Config.LEVEL_STRING, Config.VISUALS);
             printResults(result);
-            agents.inGame.Logger.getInstance().logLevelResult(result, Config.LEVEL_STRING);
+            Logger.getInstance().logLevelResult(result, Config.LEVEL_STRING);
         }
     }
 }

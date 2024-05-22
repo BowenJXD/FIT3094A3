@@ -1,12 +1,6 @@
-package agents.inGame;
+package agents.EAController;
 
 import com.google.gson.Gson;
-import engine.core.MarioForwardModel;
-import engine.helper.GameStatus;
-
-import java.util.Arrays;
-import java.util.EnumMap;
-import java.util.Map;
 
 public class UniformIndividual extends Individual {
     protected int[] chromosome;
