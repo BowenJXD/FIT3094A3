@@ -46,6 +46,7 @@ public abstract class Individual {
                         model.getMarioFloatPos()[1] > Config.FLOOR_Y) 
                 ? config.SCORE[Config.ScoreType.Death.ordinal()] : 0));
         scoreMap.put(Config.ScoreType.X, model.getMarioFloatPos()[0] * config.SCORE[Config.ScoreType.X.ordinal()]);
+        scoreMap.put(Config.ScoreType.Y, -model.getMarioFloatPos()[1] * config.SCORE[Config.ScoreType.Y.ordinal()]);
         fitness = scoreMap.values().stream().reduce(0f, Float::sum);
     }
     

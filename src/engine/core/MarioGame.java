@@ -275,6 +275,7 @@ public class MarioGame {
         ArrayList<MarioAgentEvent> agentEvents = new ArrayList<>();
         while (this.world.gameStatus == GameStatus.RUNNING) {
             if (!this.pause) {
+                currentTime = System.currentTimeMillis();
                 if(assessedMode){
                     if(System.currentTimeMillis() - startTime > timer * 1000){
                         this.world.gameStatus = GameStatus.REAL_TIME_OUT;

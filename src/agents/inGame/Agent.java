@@ -24,7 +24,7 @@ public class Agent implements MarioAgent {
             var config = pop.getConfig();
             config.VARIABLES.replace('p', new float[]{(float) (1 + i * 0.1), (float) (1 + i * 0.1), 0.2f});
             pop.setConfig(config);
-            populations[i] = new Population();
+            populations[i] = pop;
             if (Config.LOAD_DATA_PATH.equals("")) {
                 populations[i].populate(generation);
             }
@@ -39,22 +39,32 @@ public class Agent implements MarioAgent {
     public boolean[] getActions(MarioForwardModel model, MarioTimer timer) {
         generation++;
         boolean[] actionCache = actions.clone();
-        
+
         List<Individual> individuals = new ArrayList<>();
         for (int i = 0; i < Config.NUM_POPULATION; i++) {
-            populations[i].evolve(model);
+            populations[i] = new Population();
+            populations[i].populate(generation);
+            populations[i].setUp(populations[i].getIndividuals(), model);
+            for (int j = 0; j < Config.NUM_GENERATION; j++) {
+                populations[i].evolve(model);
+            }
             individuals.addAll(populations[i].getIndividuals());
         }
-        individuals.sort(Comparator.comparing(Individual::getFitness).reversed());
+        individuals.sort((a, b) -> Double.compare(b.getFitness(), a.getFitness()));
         Individual best = individuals.getFirst();
+        if (best.fitness < 0) {
+            actions = new boolean[]{false, false, false, false, false};
+        }
+        else{
+            actions = best.nextActions(best.getGeneration());
+        }
         Logger.getInstance().logIndividual(best); // 
-        actions = best.nextActions(generation);
         log(best);
 
         // if Mario is on the ground and the jump action is enabled, disable it
-        if (model.isMarioOnGround() && actionCache[MarioActions.JUMP.getValue()]) {
-            actions[MarioActions.JUMP.getValue()] = false;
-        }
+//        if (model.isMarioOnGround() && actionCache[MarioActions.JUMP.getValue()]) {
+//            actions[MarioActions.JUMP.getValue()] = false;
+//        }
         
         return actions;
     }

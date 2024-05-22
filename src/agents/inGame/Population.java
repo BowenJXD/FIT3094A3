@@ -41,6 +41,9 @@ public class Population {
         passAway();
         individuals.addAll(offspring);
         individuals = select(individuals);
+//        individuals = individuals.subList(0, 1);
+//        individuals.addAll(offspring.subList(0, config.POPULATION_SIZE - 1));
+//        individuals.sort((a, b) -> Double.compare(b.getFitness(), a.getFitness()));
     }
 
     public List<Individual> crossover(List<Individual> parent){
@@ -66,7 +69,7 @@ public class Population {
     }
 
     public List<Individual> select(List<Individual> individuals){
-        individuals = Selection.tournamentSelection(individuals, config.POPULATION_SIZE);
+        individuals = Selection.elitism(individuals, config.ELITISM_SIZE);
         return individuals;
     }
 
