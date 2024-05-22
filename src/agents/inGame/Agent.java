@@ -39,7 +39,7 @@ public class Agent implements MarioAgent {
     @Override
     public boolean[] getActions(MarioForwardModel model, MarioTimer timer) {
         step++;
-        if (bestCache != null && bestCache.step < step - Config.LENGTH / 5) {
+        if (bestCache != null && bestCache.step < step - Config.BESTCACHE_AGE) {
             bestCache = null;
         }
         boolean[] actionCache = actions.clone();

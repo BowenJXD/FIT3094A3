@@ -2,8 +2,6 @@ package agents.inGame;
 
 import engine.helper.MarioActions;
 
-import java.lang.reflect.Array;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -42,6 +40,7 @@ public class Config {
 
     public static final int NUM_POPULATION = 2;
     public static final int NUM_GENERATION = 20;
+    public static final int BESTCACHE_AGE = LENGTH / 4;
     
     public static final int RANDOM_SEED = 42;
     public static Random rand = new Random(RANDOM_SEED);
