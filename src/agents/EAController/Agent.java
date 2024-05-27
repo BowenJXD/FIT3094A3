@@ -42,10 +42,9 @@ public class Agent implements MarioAgent {
         if (bestCache != null && bestCache.step < step - Config.BESTCACHE_AGE) {
             bestCache = null;
         }
-        boolean[] actionCache = actions.clone();
 
         Individual best = null;
-        for (int g = 0; g < 100; g++) {
+        for (int g = 0; g < 10; g++) {
             List<Individual> individuals = new ArrayList<>();
             for (int i = 0; i < Config.NUM_POPULATION; i++) {
                 Population pop = new Population();
@@ -65,23 +64,23 @@ public class Agent implements MarioAgent {
             individuals.sort((a, b) -> Double.compare(b.getFitness(), a.getFitness()));
             best = individuals.getFirst();
             if (best.getFitness() > 0) {
+                if (g > 0){
+                    System.out.println("Retry successful at generation: " + g);
+                }
                 break;
             }
-            bestCache = best;
         }
         
         if (bestCache != null && best.getFitness() < bestCache.getFitness()) {
             best = bestCache;
         }
+        else{
+            bestCache = best;
+        }
         actions = best.nextActions(step);
         // Logger.getInstance().logIndividual(best); // 
         // log(best);
 
-        // if Mario is on the ground and the jump action is enabled, disable it
-//        if (model.isMarioOnGround() && actionCache[MarioActions.JUMP.getValue()]) {
-//            actions[MarioActions.JUMP.getValue()] = false;
-//        }
-        bestCache = best;
         return actions;
     }
     

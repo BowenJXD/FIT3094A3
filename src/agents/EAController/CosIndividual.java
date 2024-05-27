@@ -3,9 +3,7 @@ package agents.EAController;
 import com.google.gson.Gson;
 import engine.helper.MarioActions;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class CosIndividual extends Individual {
     protected float[] chromosome;
@@ -25,20 +23,25 @@ public class CosIndividual extends Individual {
         chromosome = gson.fromJson(gene, float[].class);
     }
 
+    public List<boolean[]> actionsCache = new ArrayList<boolean[]>();
+    
     @Override
     public boolean[] getActions(int index){
+        if (actionsCache.size() > index) {
+            return actionsCache.get(index);
+        }
+        
         boolean[] actions = config.DEFAULT_ACTIONS.clone();
         int v = config.VARIABLES.size();
         for (int i = 0; i < config.ACTIONS.length; i++) {
             if (config.ACTIONS[i] == MarioActions.LEFT.getValue()) {
                 double left = getAction(index, Arrays.copyOfRange(chromosome, i*v, i*v+v));
-                int j = MarioActions.RIGHT.getValue();
-                double right = getAction(index, Arrays.copyOfRange(chromosome, j*v, j*v+v));
-                actions[MarioActions.LEFT.getValue()] = left > right;
-                actions[MarioActions.RIGHT.getValue()] = right > left;
+                actions[MarioActions.LEFT.getValue()] = left > 0;
+                actions[MarioActions.RIGHT.getValue()] = 0 > left;
             }
             actions[config.ACTIONS[i]] = getAction(index, Arrays.copyOfRange(chromosome, i*v, i*v+v)) > 0;
         }
+        actionsCache.add(actions);
 
         return actions;
     }
@@ -90,6 +93,20 @@ public class CosIndividual extends Individual {
             int j = i % keys.length;
             if (rand.nextDouble() < config.MUTATION_PROBABILITY) {
                 chromosome[i] = vars.get(keys[j])[0] + (vars.get(keys[j])[1] - vars.get(keys[j])[0]) * rand.nextFloat();
+            }
+        }
+    }
+
+    @Override
+    public void mutateTowards(Individual best) {
+        var vars = config.VARIABLES;
+        Character[] keys = config.KEYS;
+        CosIndividual bestIndividual = (CosIndividual) best;
+        for (int i = 0; i < chromosome.length; i++) {
+            if (rand.nextDouble() < config.MUTATION_PROBABILITY) {
+                float diff = bestIndividual.getChromosome()[i] - chromosome[i];
+                float delta = rand.nextFloat() * diff;
+                chromosome[i] += delta;
             }
         }
     }

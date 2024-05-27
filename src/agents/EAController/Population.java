@@ -39,8 +39,8 @@ public class Population {
         
         List<Individual> offspring = crossover(individuals);
         mutate(offspring);
+        mutateTowards(offspring, individuals.getFirst());
         setUp(offspring, model);
-        passAway();
         individuals.addAll(offspring);
         individuals = select(individuals);
 //        individuals = individuals.subList(0, 1);
@@ -50,12 +50,21 @@ public class Population {
 
     public List<Individual> crossover(List<Individual> parent){
         List<Individual> offspring = new ArrayList<>();
-        for (int i = 0; i < parent.size() - 1; i ++) {
-            Individual parent1 = parent.get(i);
-            Individual parent2 = parent.get(i + 1);
+        List<String> parentNameCache = new ArrayList<>();
+        for (int i = 0; i < Config.OFFSPRING_NUM / 2; i ++) {
+            Individual parent1 = Selection.rankRouletteWheel(parent);
+            Individual parent2 = Selection.rankRouletteWheel(parent);
+            String parentName = parent1.getName() + parent2.getName();
+            if (parentNameCache.contains(parentName)) {
+                i--;
+                continue;
+            }
+            else {
+                parentNameCache.add(parentName);
+            }
             Individual[] offsprings = parent1.crossover(parent2);
             for (int j = 0; j < offsprings.length; j++) {
-                offsprings[j].init(step, generation, i + j, new String[]{parent1.getName(), parent2.getName()});
+                offsprings[j].init(step, generation, 2*i + j, new String[]{parent1.getName(), parent2.getName()});
                 offsprings[j].setConfig(config);
                 offspring.add(offsprings[j]);
             }
@@ -66,6 +75,14 @@ public class Population {
     public List<Individual> mutate(List<Individual> individuals){
         for (Individual individual : individuals) {
             individual.mutate();
+        }
+        return individuals;
+    }
+    
+    
+    public List<Individual> mutateTowards(List<Individual> individuals, Individual best){
+        for (Individual individual : individuals) {
+            individual.mutateTowards(best);
         }
         return individuals;
     }
@@ -88,6 +105,7 @@ public class Population {
             individual.advanceModel(model);
             individual.calculateFitness();
         }
+        individuals.sort((a, b) -> Double.compare(b.getFitness(), a.getFitness()));
     }
 
     public List<Individual> getIndividuals() {

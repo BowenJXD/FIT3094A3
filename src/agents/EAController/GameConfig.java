@@ -16,10 +16,17 @@ public class GameConfig {
     public static int getPopulationSize(){
         return getRandomBetween(10, 100);
     }
+    
+    public int offspringSizeIndex;
+    public static int getOffspringSize(){
+        return getRandomBetween(10, 100);
+    }
+    
     public int elitismSizeIndex;
     public static int getElitismSize(){
         return getRandomBetween(10, 80);
     }
+    
     public int mutationProbabilityIndex;
     public static int getMutationProbability(){
         return getRandomBetween(1, 100);
@@ -35,39 +42,42 @@ public class GameConfig {
         return getRandomBetween(10, 100);
     }
     
-    public int bestCacheAge;
+    public int bestCacheAgeIndex;
     public static int getBestCacheAge(){
-        return getRandomBetween(1, 10);
+        return getRandomBetween(10, 100);
     }
     
     public GameConfig(){
         predictionLength = getPredictionLength();
         populationSize = getPopulationSize();
+        offspringSizeIndex = getOffspringSize();
         elitismSizeIndex = getElitismSize();
         mutationProbabilityIndex = getMutationProbability();
         numPopulation = getNumPopulation();
         numGeneration = getNumGeneration();
-        bestCacheAge = getBestCacheAge();
+        bestCacheAgeIndex = getBestCacheAge();
     }
     
     public GameConfig(int[] gene){
         predictionLength = gene[0];
         populationSize = gene[1];
-        elitismSizeIndex = gene[2];
-        mutationProbabilityIndex = gene[3];
-        numPopulation = gene[4];
-        numGeneration = gene[5];
-        bestCacheAge = gene[6];        
+        offspringSizeIndex = gene[2];
+        elitismSizeIndex = gene[3];
+        mutationProbabilityIndex = gene[4];
+        numPopulation = gene[5];
+        numGeneration = gene[6];
+        bestCacheAgeIndex = gene[7];
     }
     
     public void applyConfig(){
         Config.LENGTH = predictionLength;
         Config.POPULATION_SIZE = populationSize;
+        Config.OFFSPRING_NUM = populationSize * offspringSizeIndex / 100;
         Config.ELITISM_SIZE = populationSize * elitismSizeIndex / 100;
         Config.MUTATION_PROBABILITY = Math.pow(mutationProbabilityIndex / 200.0, 2);
         Config.NUM_POPULATION = numPopulation;
         Config.NUM_GENERATION = numGeneration;
-        Config.BESTCACHE_AGE = bestCacheAge;
+        Config.BESTCACHE_AGE = bestCacheAgeIndex * Config.LENGTH / 100;
         Config.VARIABLES = Map.of(
                 'a', new float[]{0, 1, 0},
                 'h', new float[]{-predictionLength, predictionLength, 0},
@@ -76,7 +86,7 @@ public class GameConfig {
     }
     
     public int[] getGene(){
-        return new int[]{predictionLength, populationSize, elitismSizeIndex, mutationProbabilityIndex, numPopulation, numGeneration, bestCacheAge};
+        return new int[]{predictionLength, populationSize, offspringSizeIndex, elitismSizeIndex, mutationProbabilityIndex, numPopulation, numGeneration, bestCacheAgeIndex};
     }
     
     public void setGene(int index, int value){
@@ -88,19 +98,22 @@ public class GameConfig {
                 populationSize = value;
                 break;
             case 2:
-                elitismSizeIndex = value;
+                offspringSizeIndex = value;
                 break;
             case 3:
-                mutationProbabilityIndex = value;
+                elitismSizeIndex = value;
                 break;
             case 4:
-                numPopulation = value;
+                mutationProbabilityIndex = value;
                 break;
             case 5:
-                numGeneration = value;
+                numPopulation = value;
                 break;
             case 6:
-                bestCacheAge = value;
+                numGeneration = value;
+                break;
+            case 7:
+                bestCacheAgeIndex = value;
                 break;
         }
     }
@@ -116,19 +129,22 @@ public class GameConfig {
                         populationSize = getPopulationSize();
                         break;
                     case 2:
-                        elitismSizeIndex = getElitismSize();
+                        offspringSizeIndex = getOffspringSize();
                         break;
                     case 3:
-                        mutationProbabilityIndex = getMutationProbability();
+                        elitismSizeIndex = getElitismSize();
                         break;
                     case 4:
-                        numPopulation = getNumPopulation();
+                        mutationProbabilityIndex = getMutationProbability();
                         break;
                     case 5:
-                        numGeneration = getNumGeneration();
+                        numPopulation = getNumPopulation();
                         break;
                     case 6:
-                        bestCacheAge = getBestCacheAge();
+                        numGeneration = getNumGeneration();
+                        break;
+                    case 7:
+                        bestCacheAgeIndex = getBestCacheAge();
                         break;
                 }
             }
@@ -150,10 +166,11 @@ public class GameConfig {
     public String toString() {
         return  "len " + predictionLength +
                 " | psz " + populationSize +
+                " | osz " + offspringSizeIndex +
                 " | esz " + elitismSizeIndex +
                 " | mpi " + mutationProbabilityIndex +
                 " | npp " + numPopulation +
                 " | gen " + numGeneration +
-                " | age " + bestCacheAge;
+                " | bca " + bestCacheAgeIndex;
     }
 }

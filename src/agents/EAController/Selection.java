@@ -1,8 +1,6 @@
 package agents.EAController;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class Selection {
     public static List<Individual> elitism(List<Individual> population, int numAgents) {
@@ -34,17 +32,17 @@ public class Selection {
     }
     
     public static Individual rankRouletteWheel(List<Individual> population){
-        double wheel = population.stream().mapToDouble(Individual::getFitness).sum();
         Random rand = Config.rand;
-        double pick = rand.nextDouble() * wheel;
-        double current = 0;
-        for (Individual agent : population) {
-            current += agent.getFitness();
+        int wheel = getSigmaPowered(population.size(), 2);
+        int pick = rand.nextInt(wheel);
+        int current = 0;
+        for (int j = 0; j < population.size(); j++) {
+            current += (int) Math.pow(population.size() - j, 2);
             if (current > pick) {
-                return agent;
+                return population.get(j);
             }
         }
-        return null;
+        return population.get(0);
     }
     
 /*    public static List<Individual> rankRouletteWheel(List<Individual> population, int numAgents, int rankPower) {
@@ -66,11 +64,17 @@ public class Selection {
         return selection;
     }*/
     
+    public static Map<Integer, Integer> rankMapCache = new HashMap<>();
+    
     public static int getSigmaPowered(int n, int p){
+        if (rankMapCache.containsKey(n)){
+            return rankMapCache.get(n);
+        }
         int result = 0;
         for (int i = 1; i <= n; i++) {
             result += (int) Math.pow(i, p);
         }
+        rankMapCache.put(n, result);
         return result;
     }
 

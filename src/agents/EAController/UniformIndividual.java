@@ -66,6 +66,22 @@ public class UniformIndividual extends Individual {
     }
 
     @Override
+    public void mutateTowards(Individual best) {
+        UniformIndividual bestIndividual = (UniformIndividual) best;
+        for (int i = 0; i < chromosome.length; i++) {
+            if (rand.nextDouble() < config.MUTATION_PROBABILITY) {
+                int diff = bestIndividual.getChromosome()[i] - chromosome[i];
+                int delta = rand.nextInt(Math.abs(diff) + 1);
+                if (diff > 0) {
+                    chromosome[i] += delta;
+                } else if (diff < 0) {
+                    chromosome[i] -= delta;
+                }
+            }
+        }
+    }
+
+    @Override
     public String logGene() {
         Gson gson = new Gson();
         return gson.toJson(chromosome);

@@ -21,7 +21,8 @@ public class OutGameEvolution {
     public static final int POPULATION_SIZE = 6;
     public static final int NUM_GENERATION = 10;
     public static final float MUTATION_RATE = 0.1f;
-    public static final boolean ALL_LEVELS = false;
+    public static final String LEVEL = "6-3";
+    public static final boolean VISUAL = true;
     
     public Random random = new Random();
     
@@ -43,14 +44,14 @@ public class OutGameEvolution {
             System.out.println(currentConfig);
             currentConfig.applyConfig();
             Agent agent = new Agent();
-            if (ALL_LEVELS) {
-                var results = PlayLevel.runLevels(agent, true);
+            if (LEVEL == "") {
+                var results = PlayLevel.runLevels(agent, VISUAL);
                 for (int j = 0; j < results.size(); j++) {
                     population.get(j).fitness = results.get(j).getCompletionPercentage() * results.get(j).getRemainingTime();
                 }
             }
             else {
-                var result = PlayLevel.runLevel(agent, "", false); 
+                var result = PlayLevel.runLevel(agent, LEVEL, VISUAL); 
                 currentConfig.fitness = result.getCompletionPercentage() * result.getRemainingTime();
             }
             System.out.println("Fitness: " + currentConfig.fitness);
@@ -128,9 +129,11 @@ public class OutGameEvolution {
     public void saveConfigs() {
         Gson gson = new Gson();
         try {
+            StringBuilder sb = new StringBuilder();
             for (GameConfig currentConfig : population) {
-                Files.write(Paths.get(configPath), (gson.toJson(currentConfig) + "\n").getBytes());
+                sb.append(gson.toJson(currentConfig)).append("\n");
             }
+            Files.write(Paths.get(configPath), sb.toString().getBytes());
         } catch (IOException e) {
             e.printStackTrace();
         }

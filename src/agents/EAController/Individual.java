@@ -32,7 +32,11 @@ public abstract class Individual {
 
     public abstract void mutate();
 
+    public abstract void mutateTowards(Individual best);
+
     public abstract String logGene();
+    
+    public List<MarioForwardModel> modelCache = new ArrayList<>();
     
     public void advanceModel(MarioForwardModel newModel){
         model = newModel.clone();
@@ -42,6 +46,7 @@ public abstract class Individual {
             model.advance(getActions(i));
             if (model.getMarioFloatPos()[0] > maxX) maxX = model.getMarioFloatPos()[0];
             if (model.getMarioFloatPos()[1] < minY) minY = model.getMarioFloatPos()[1];
+            // modelCache.add(model.clone());
         }
     }
     
@@ -91,4 +96,5 @@ public abstract class Individual {
     public int getGeneration() { return generation; }
     public PopulationConfig getConfig() { return config; }
     public void setConfig(PopulationConfig config) { this.config = config; }
+
 }

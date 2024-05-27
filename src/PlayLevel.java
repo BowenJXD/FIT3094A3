@@ -57,7 +57,7 @@ public class PlayLevel {
         MarioGame game = new MarioGame();
         List<MarioResult> results = new ArrayList<>();
         for (String level : levels) {
-            MarioResult result = game.runGame(agent, getLevel(level), 30, 0, visual, visual ? 60 : 1000);
+            MarioResult result = game.runGame(agent, getLevel(level), 60, 0, visual, visual ? 60 : 1000);
             results.add(result);
             game.CloseWindow();
             String levelName = level.substring(level.lastIndexOf("-") - 1, level.lastIndexOf(".")).replace("-", ".");
@@ -91,7 +91,11 @@ public class PlayLevel {
         var agent = new Agent(); // Change this to your own agent
         
         if (Config.RUN_ALL_LEVELS){
-            runLevels(agent, Config.VISUALS);
+            var result = runLevels(agent, Config.VISUALS);
+            float fitness = 0;
+            for (var r : result){
+                fitness += r.getCompletionPercentage() * r.getRemainingTime();
+            }
         }
         else {
             MarioResult result = runLevel(agent, Config.LEVEL_STRING, Config.VISUALS);
