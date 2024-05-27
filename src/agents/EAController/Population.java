@@ -50,7 +50,7 @@ public class Population {
 
     public List<Individual> crossover(List<Individual> parent){
         List<Individual> offspring = new ArrayList<>();
-        for (int i = 0; i < parent.size(); i += 2) {
+        for (int i = 0; i < parent.size() - 1; i ++) {
             Individual parent1 = parent.get(i);
             Individual parent2 = parent.get(i + 1);
             Individual[] offsprings = parent1.crossover(parent2);

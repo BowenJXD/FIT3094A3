@@ -8,6 +8,10 @@ public class Selection {
     public static List<Individual> elitism(List<Individual> population, int numAgents) {
         List<Individual> agents = new ArrayList<>(population);
         agents.sort((a, b) -> Double.compare(b.getFitness(), a.getFitness()));
+        if (numAgents == agents.size())
+            System.out.println("Warning: Elitism selection size is equal to population size");
+        if (numAgents > agents.size())
+            System.out.println("Warning: Elitism selection size is greater than population size");
         return agents.subList(0, numAgents);
     }
 
@@ -27,6 +31,20 @@ public class Selection {
             }
         }
         return selection;
+    }
+    
+    public static Individual rankRouletteWheel(List<Individual> population){
+        double wheel = population.stream().mapToDouble(Individual::getFitness).sum();
+        Random rand = Config.rand;
+        double pick = rand.nextDouble() * wheel;
+        double current = 0;
+        for (Individual agent : population) {
+            current += agent.getFitness();
+            if (current > pick) {
+                return agent;
+            }
+        }
+        return null;
     }
     
 /*    public static List<Individual> rankRouletteWheel(List<Individual> population, int numAgents, int rankPower) {

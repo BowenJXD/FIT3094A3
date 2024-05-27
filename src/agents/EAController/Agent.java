@@ -50,7 +50,9 @@ public class Agent implements MarioAgent {
             for (int i = 0; i < Config.NUM_POPULATION; i++) {
                 Population pop = new Population();
                 var config = pop.getConfig();
-                config.SCORE = i == 0? new int[]{(int) 1E6, -Integer.MAX_VALUE, 100, 1} : new int[]{(int) 1E6, -Integer.MAX_VALUE, 1, 100};
+                int x = Math.max(100 - i * Config.INTERVAL(), 1);
+                int y = Math.max(100 - x, 1);
+                config.SCORE = new int[]{(int) 1E6, -Integer.MAX_VALUE, x, y};
                 pop.setConfig(config);
                 populations[i] = pop;
                 populations[i].populate(step);
@@ -72,8 +74,8 @@ public class Agent implements MarioAgent {
             best = bestCache;
         }
         actions = best.nextActions(step);
-        Logger.getInstance().logIndividual(best); // 
-        log(best);
+        // Logger.getInstance().logIndividual(best); // 
+        // log(best);
 
         // if Mario is on the ground and the jump action is enabled, disable it
 //        if (model.isMarioOnGround() && actionCache[MarioActions.JUMP.getValue()]) {
@@ -104,5 +106,7 @@ public class Agent implements MarioAgent {
     }
 
     @Override
-    public void train(MarioForwardModel model) {}
+    public void train(MarioForwardModel model) {
+        
+    }
 }

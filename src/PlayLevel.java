@@ -57,7 +57,7 @@ public class PlayLevel {
         MarioGame game = new MarioGame();
         List<MarioResult> results = new ArrayList<>();
         for (String level : levels) {
-            MarioResult result = game.runGame(agent, getLevel(level), 60, 0, visual, visual ? 60 : 1000);
+            MarioResult result = game.runGame(agent, getLevel(level), 30, 0, visual, visual ? 60 : 1000);
             results.add(result);
             game.CloseWindow();
             String levelName = level.substring(level.lastIndexOf("-") - 1, level.lastIndexOf(".")).replace("-", ".");

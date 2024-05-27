@@ -86,6 +86,8 @@ public class Logger {
                         individual = new UniformIndividual(data.chromosome);
                     } else if (Config.INDIVIDUAL_CLASS == "CosIndividual") {
                         individual = new CosIndividual(data.chromosome);
+                    }else{
+                        individual = new CosIndividual(data.chromosome);
                     }
 //                    String name = data.name;
 //                    int generation = Integer.parseInt(name.substring(0, name.indexOf("-")));

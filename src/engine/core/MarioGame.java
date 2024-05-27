@@ -288,9 +288,9 @@ public class MarioGame {
                 boolean[] actions = this.agent.getActions(new MarioForwardModel(this.world.clone()), agentTimer);
                 if (MarioGame.verbose) {
                     long remainingTime = agentTimer.getRemainingTime();
-                    if (remainingTime < -1) {
-                        System.out.println("The Agent is slowing down the game by " + Math.abs(remainingTime) + "ms!");
-                    }
+//                    if (remainingTime < -1) {
+//                        System.out.println("The Agent is slowing down the game by " + Math.abs(remainingTime) + "ms!");
+//                    }
                 }
                 // update world
                 this.world.update(actions);
