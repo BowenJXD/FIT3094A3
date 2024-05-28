@@ -56,7 +56,6 @@ public class Population {
             Individual parent2 = Selection.rankRouletteWheel(parent);
             String parentName = parent1.getName() + parent2.getName();
             if (parentNameCache.contains(parentName)) {
-                i--;
                 continue;
             }
             else {

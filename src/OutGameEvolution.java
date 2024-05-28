@@ -3,7 +3,9 @@ import com.google.gson.Gson;
 import engine.core.MarioAgent;
 import engine.core.MarioGame;
 import engine.core.MarioResult;
+import engine.helper.GameStatus;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -16,13 +18,14 @@ public class OutGameEvolution {
     
     public static final String configPath = "log/gameConfigs.json";
     
-    public List<GameConfig> population;
+    public List<GameConfig> population = new ArrayList<>();
     
-    public static final int POPULATION_SIZE = 6;
-    public static final int NUM_GENERATION = 10;
+    public static final int POPULATION_SIZE = 5;
+    public static final int NUM_GENERATION = 5;
     public static final float MUTATION_RATE = 0.1f;
-    public static final String LEVEL = "6-3";
+    public static final String LEVEL = "";
     public static final boolean VISUAL = true;
+    public static final boolean LOAD = true;
     
     public Random random = new Random();
     
@@ -36,6 +39,7 @@ public class OutGameEvolution {
             population.sort((a, b) -> Float.compare(b.fitness, a.fitness));
             select();
             best = population.getFirst();
+            saveConfigs();
         }
     }
     
@@ -44,20 +48,38 @@ public class OutGameEvolution {
             System.out.println(currentConfig);
             currentConfig.applyConfig();
             Agent agent = new Agent();
+            float totalCompletion = 0;
             if (LEVEL == "") {
                 var results = PlayLevel.runLevels(agent, VISUAL);
+                float fitness = 0;
                 for (int j = 0; j < results.size(); j++) {
-                    population.get(j).fitness = results.get(j).getCompletionPercentage() * results.get(j).getRemainingTime();
+                    fitness += getFitness(results.get(j));
+                    totalCompletion += results.get(j).getGameStatus() == GameStatus.WIN ? 1 : 0;
                 }
+                currentConfig.fitness = fitness / results.size();
+                currentConfig.fitness += totalCompletion == results.size() ? 100000 : 0;
             }
             else {
                 var result = PlayLevel.runLevel(agent, LEVEL, VISUAL); 
-                currentConfig.fitness = result.getCompletionPercentage() * result.getRemainingTime();
+                currentConfig.fitness = getFitness(result);
+                totalCompletion = result.getCompletionPercentage();
             }
-            System.out.println("Fitness: " + currentConfig.fitness);
+            System.out.println("Fitness: " + currentConfig.fitness + " Completion: " + totalCompletion);
         }
     }
     
+    public float getFitness(MarioResult result){
+        float completion = result.getCompletionPercentage();
+        float remainingTime = result.getRemainingTime();
+        boolean timeOut = result.getGameStatus() == GameStatus.REAL_TIME_OUT;
+        if (timeOut) {
+            return completion;
+        }
+        else {
+            return completion * remainingTime;
+        }
+    }
+
     public void crossover() {
         List<GameConfig> newPopulation = new ArrayList<>();
         for (int j = 0; j < POPULATION_SIZE - 1; j++) {
@@ -112,9 +134,6 @@ public class OutGameEvolution {
         try {
             String content = new String(Files.readAllBytes(Paths.get(configPath)));
             String[] lines = content.split("\n");
-            if (lines.length > 10) {
-                lines = new String[]{lines[lines.length - 10]};
-            }
             for (int i = 0; i < lines.length; i++) {
                 if (lines[i].isEmpty()) {
                     continue;
@@ -128,12 +147,8 @@ public class OutGameEvolution {
     
     public void saveConfigs() {
         Gson gson = new Gson();
-        try {
-            StringBuilder sb = new StringBuilder();
-            for (GameConfig currentConfig : population) {
-                sb.append(gson.toJson(currentConfig)).append("\n");
-            }
-            Files.write(Paths.get(configPath), sb.toString().getBytes());
+        try (FileWriter writer = new FileWriter(configPath, true)) {
+            writer.append(gson.toJson(population.getFirst())).append("\n");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -141,13 +156,18 @@ public class OutGameEvolution {
     
     public static void main(String[] args) {
         OutGameEvolution evolution = new OutGameEvolution();
-        evolution.loadConfigs();
-        if (evolution.population.isEmpty()) {
-            for (int i = 0; i < POPULATION_SIZE; i++) {
+        if (LOAD) {
+            evolution.loadConfigs();
+            evolution.population.sort((a, b) -> Float.compare(b.fitness, a.fitness));
+            evolution.populate();
+        }
+        if (evolution.population.size() < POPULATION_SIZE) {
+            for (int i = 0; i < POPULATION_SIZE - evolution.population.size() + 1; i++) {
                 evolution.population.add(new GameConfig());
             }
             evolution.populate();
         }
+        evolution.population.sort((a, b) -> Float.compare(b.fitness, a.fitness));
         evolution.evolve();
         evolution.saveConfigs();
     }

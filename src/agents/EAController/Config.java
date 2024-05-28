@@ -44,7 +44,7 @@ public class Config {
     public static int NUM_GENERATION = 20;
     public static int BESTCACHE_AGE = LENGTH / 2;
     
-    public static int RANDOM_SEED = 42;
+    public static int RANDOM_SEED = 24;
     public static Random rand = new Random(RANDOM_SEED);
 
     public static String LEVEL_STRING = "6-3";

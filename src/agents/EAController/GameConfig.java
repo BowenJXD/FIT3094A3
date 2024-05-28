@@ -29,7 +29,7 @@ public class GameConfig {
     
     public int mutationProbabilityIndex;
     public static int getMutationProbability(){
-        return getRandomBetween(1, 100);
+        return getRandomBetween(10, 100);
     }
     
     public int numPopulation;
