@@ -31,7 +31,7 @@ public class Selection {
         return selection;
     }
     
-    public static Individual rankRouletteWheel(List<Individual> population){
+    public static <T> T rankRouletteWheel(List<T> population){
         Random rand = Config.rand;
         int wheel = getSigmaPowered(population.size(), 2);
         int pick = rand.nextInt(wheel);

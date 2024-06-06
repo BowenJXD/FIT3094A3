@@ -19,6 +19,7 @@ public abstract class Individual {
     protected float initX = 0;
     protected float maxX = 0;
     protected float minY = 1000;
+    protected boolean lost = false;
 
     public Individual() {
         rand = Config.rand;
@@ -46,6 +47,7 @@ public abstract class Individual {
             model.advance(getActions(i));
             if (model.getMarioFloatPos()[0] > maxX) maxX = model.getMarioFloatPos()[0];
             if (model.getMarioFloatPos()[1] < minY) minY = model.getMarioFloatPos()[1];
+            if (model.getMarioFloatPos()[1] > Config.FLOOR_Y) { lost = true; return; }
             // modelCache.add(model.clone());
         }
     }
@@ -56,7 +58,7 @@ public abstract class Individual {
                 ? config.SCORE[Config.ScoreType.Win.ordinal()] + model.getRemainingTime() : 0));
         scoreMap.put(Config.ScoreType.Death, (float) ((
                         model.getGameStatus() == GameStatus.LOSE ||
-                        model.getMarioFloatPos()[1] > Config.FLOOR_Y) 
+                        lost) 
                 ? config.SCORE[Config.ScoreType.Death.ordinal()] : 0));
         scoreMap.put(Config.ScoreType.X, (maxX - initX) * config.SCORE[Config.ScoreType.X.ordinal()]);
         scoreMap.put(Config.ScoreType.Y, (model.getLevelFloatDimensions()[1] - minY) * config.SCORE[Config.ScoreType.Y.ordinal()]);

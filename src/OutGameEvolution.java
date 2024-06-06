@@ -21,10 +21,10 @@ public class OutGameEvolution {
     public List<GameConfig> population = new ArrayList<>();
     
     public static final int POPULATION_SIZE = 5;
-    public static final int NUM_GENERATION = 5;
+    public static final int NUM_GENERATION = 10;
     public static final float MUTATION_RATE = 0.1f;
     public static final String LEVEL = "";
-    public static final boolean VISUAL = true;
+    public static final boolean VISUAL = false;
     public static final boolean LOAD = true;
     
     public Random random = new Random();
@@ -32,14 +32,19 @@ public class OutGameEvolution {
     public void evolve(){
         GameConfig best = population.getFirst();
         for (int i = 0; i < NUM_GENERATION; i++) {
+            var parents = new ArrayList<>(population);
             crossover();
             mutateTowardsBest(MUTATION_RATE, best);
             mutate(MUTATION_RATE);
             populate();
+            population.addAll(parents.subList(0, POPULATION_SIZE / 2));
             population.sort((a, b) -> Float.compare(b.fitness, a.fitness));
             select();
-            best = population.getFirst();
-            saveConfigs();
+            if (best != population.getFirst()) {
+                best = population.getFirst();
+                saveConfigs();
+            }
+            System.out.println("Generation: " + i + " Best Fitness: " + best.fitness);
         }
     }
     
@@ -50,7 +55,7 @@ public class OutGameEvolution {
             Agent agent = new Agent();
             float totalCompletion = 0;
             if (LEVEL == "") {
-                var results = PlayLevel.runLevels(agent, VISUAL);
+                var results = PlayLevel.runLevels(agent, VISUAL, false);
                 float fitness = 0;
                 for (int j = 0; j < results.size(); j++) {
                     fitness += getFitness(results.get(j));
@@ -68,7 +73,7 @@ public class OutGameEvolution {
         }
     }
     
-    public float getFitness(MarioResult result){
+    public static float getFitness(MarioResult result){
         float completion = result.getCompletionPercentage();
         float remainingTime = result.getRemainingTime();
         boolean timeOut = result.getGameStatus() == GameStatus.REAL_TIME_OUT;
@@ -83,8 +88,8 @@ public class OutGameEvolution {
     public void crossover() {
         List<GameConfig> newPopulation = new ArrayList<>();
         for (int j = 0; j < POPULATION_SIZE - 1; j++) {
-            int[] gene1 = population.get(j).getGene();
-            int[] gene2 = population.get(j + 1).getGene();
+            int[] gene1 = Selection.rankRouletteWheel(population).getGene();
+            int[] gene2 = Selection.rankRouletteWheel(population).getGene();
             int[] offspring1 = new int[gene1.length];
             int[] offspring2 = new int[gene2.length];
             for (int i = 0; i < gene1.length; i++) {
@@ -95,7 +100,7 @@ public class OutGameEvolution {
             newPopulation.add(new GameConfig(offspring1));
             newPopulation.add(new GameConfig(offspring2));
         }
-        population = newPopulation;
+        population.addAll(newPopulation);
     }
     
     public void mutate(float rate) {
@@ -154,15 +159,49 @@ public class OutGameEvolution {
         }
     }
     
+    public void randomnessTest(){
+        loadConfigs();
+        GameConfig currentConfig = population.getFirst();
+        currentConfig.applyConfig();
+        Agent agent = new Agent();
+        int winCount = 0;
+        for (int i = 0; i < NUM_GENERATION; i++) {
+            int randSeed = random.nextInt(100);
+            Config.rand = new Random(randSeed);
+            System.out.println("Random Seed: " + randSeed);
+            float totalCompletion = 0;
+            if (LEVEL == "") {
+                var results = PlayLevel.runLevels(agent, VISUAL, true);
+                float fitness = 0;
+                for (int j = 0; j < results.size(); j++) {
+                    fitness += getFitness(results.get(j));
+                    totalCompletion += results.get(j).getGameStatus() == GameStatus.WIN ? 1 : 0;
+                }
+                currentConfig.fitness = fitness / results.size();
+                winCount += totalCompletion == 15 ? 1 : 0;
+                System.out.println("Fitness: " + currentConfig.fitness + " Completion: " + totalCompletion);
+                System.out.println("Win Count: " + winCount + " Success Rate: " + (float) winCount / (i+1));
+            }
+            else {
+                var result = PlayLevel.runLevel(agent, LEVEL, VISUAL);
+                currentConfig.fitness = getFitness(result);
+                totalCompletion = result.getCompletionPercentage();
+            }
+        }
+        System.out.println("Success Rate: " + (float) winCount / NUM_GENERATION);
+    }
+    
     public static void main(String[] args) {
         OutGameEvolution evolution = new OutGameEvolution();
+        evolution.randomnessTest();
         if (LOAD) {
             evolution.loadConfigs();
-            evolution.population.sort((a, b) -> Float.compare(b.fitness, a.fitness));
-            evolution.populate();
+/*            evolution.population.sort((a, b) -> Float.compare(b.fitness, a.fitness));
+            evolution.populate();*/
         }
         if (evolution.population.size() < POPULATION_SIZE) {
-            for (int i = 0; i < POPULATION_SIZE - evolution.population.size() + 1; i++) {
+            int limit = POPULATION_SIZE - evolution.population.size() + 1;
+            for (int i = 0; i < limit; i++) {
                 evolution.population.add(new GameConfig());
             }
             evolution.populate();

@@ -13,6 +13,7 @@ public class Agent implements MarioAgent {
     public int step = 0;
     private Population[] populations = new Population[Config.NUM_POPULATION];
     private Individual bestCache = null;
+    private MarioForwardModel modelCache = null;
 
     @Override
     public void initialize(MarioForwardModel model, MarioTimer timer) {
@@ -39,10 +40,7 @@ public class Agent implements MarioAgent {
     @Override
     public boolean[] getActions(MarioForwardModel model, MarioTimer timer) {
         step++;
-        if (bestCache != null && bestCache.step < step - Config.BESTCACHE_AGE) {
-            bestCache = null;
-        }
-
+        
         Individual best = null;
         for (int g = 0; g < 10; g++) {
             List<Individual> individuals = new ArrayList<>();
@@ -64,8 +62,11 @@ public class Agent implements MarioAgent {
             individuals.sort((a, b) -> Double.compare(b.getFitness(), a.getFitness()));
             best = individuals.getFirst();
             if (best.getFitness() > 0) {
-                if (g > 0){
+/*                if (g > 0){
                     System.out.println("Retry successful at generation: " + g);
+                }*/
+                if (bestCache != null && bestCache.step < step - Config.BESTCACHE_AGE) {
+                    bestCache = null;
                 }
                 break;
             }
@@ -80,6 +81,7 @@ public class Agent implements MarioAgent {
         actions = best.nextActions(step);
         // Logger.getInstance().logIndividual(best); // 
         // log(best);
+        modelCache = model;
 
         return actions;
     }

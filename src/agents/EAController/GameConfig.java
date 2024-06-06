@@ -151,7 +151,7 @@ public class GameConfig {
         }
     }
     
-    public static final int RANDOM_SEED = 42;
+    public static final int RANDOM_SEED = Config.RANDOM_SEED;
     public static Random rand = new Random(RANDOM_SEED);
     
     public static int getRandomBetween(int min, int max){

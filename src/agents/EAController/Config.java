@@ -22,7 +22,7 @@ public class Config {
 //            MarioActions.RIGHT.getValue(),
             MarioActions.JUMP.getValue()};
     public static boolean[] DEFAULT_ACTIONS = {false,true,false,true,false};
-    public static int LENGTH = 30;
+    public static int LENGTH = 40;
     public static Map<Character, float[]> VARIABLES = Map.of(
             'a', new float[]{0, 1, 0},
             'h', new float[]{-LENGTH, LENGTH, 0},
@@ -31,23 +31,23 @@ public class Config {
     
     public static int[] SCORE = {(int) 1E6, -Integer.MAX_VALUE, 100, 1};
     
-    public static int POPULATION_SIZE = 40;
+    public static int POPULATION_SIZE = 20;
     public static int TOURNAMENT_SIZE = Math.round(POPULATION_SIZE * 0.4f);
-    public static int OFFSPRING_NUM = POPULATION_SIZE / 2;
+    public static int OFFSPRING_NUM = (int) (POPULATION_SIZE * 0.7f);
     public static int ELITISM_SIZE = POPULATION_SIZE / 2;
-    public static double MUTATION_PROBABILITY = 0.1;
+    public static double MUTATION_PROBABILITY = 0.2;
 
     // ------------------------------------------------
 
     public static int NUM_POPULATION = 2;
     public static int INTERVAL(){ return 100 / (NUM_POPULATION - 1);}
-    public static int NUM_GENERATION = 20;
+    public static int NUM_GENERATION = 40;
     public static int BESTCACHE_AGE = LENGTH / 2;
     
-    public static int RANDOM_SEED = 24;
+    public static int RANDOM_SEED = 99;
     public static Random rand = new Random(RANDOM_SEED);
 
-    public static String LEVEL_STRING = "6-3";
+    public static String LEVEL_STRING = "8-1";
     public static boolean VISUALS = true;
     public static boolean RUN_ALL_LEVELS = false;
     public static String LOAD_DATA_PATH = "";

@@ -4,6 +4,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 
 import agents.EAController.Agent;
 import agents.EAController.Config;
@@ -11,6 +12,7 @@ import agents.EAController.Logger;
 import engine.core.MarioAgent;
 import engine.core.MarioGame;
 import engine.core.MarioResult;
+import engine.helper.GameStatus;
 
 public class PlayLevel {
     public static void printResults(MarioResult result) {
@@ -51,7 +53,7 @@ public class PlayLevel {
         return levels;
     }
     
-    public static List<MarioResult> runLevels(MarioAgent agent, boolean visual){
+    public static List<MarioResult> runLevels(MarioAgent agent, boolean visual, boolean quitOnFail){
         String[] levels = getAllLevels("./levels/SuperMarioBros");
 
         MarioGame game = new MarioGame();
@@ -62,6 +64,9 @@ public class PlayLevel {
             game.CloseWindow();
             String levelName = level.substring(level.lastIndexOf("-") - 1, level.lastIndexOf(".")).replace("-", ".");
             Logger.getInstance().logLevelResult(result, levelName);
+            if (quitOnFail && result.getGameStatus() != engine.helper.GameStatus.WIN) {
+                return results;
+            }
             // printResults(result);
         }
         return results;
@@ -85,22 +90,54 @@ public class PlayLevel {
         // printResults(result);
         return result;
     }
+    
+    public static void randomnessTest(){
+        int winCount = 0;
+        int NUM_GENERATION = 10;
+        Random random = new Random();
+        Agent agent = new Agent();
+        for (int i = 0; i < NUM_GENERATION; i++) {
+            int randSeed = random.nextInt(100);
+            Config.rand = new Random(randSeed);
+            System.out.println("Random Seed: " + randSeed);
+            float totalCompletion = 0;
+
+            float fitness = 0;
+            if (Config.RUN_ALL_LEVELS) {
+                var results = PlayLevel.runLevels(agent, true, true);
+                for (int j = 0; j < results.size(); j++) {
+                    fitness += OutGameEvolution.getFitness(results.get(j));
+                    totalCompletion += results.get(j).getGameStatus() == GameStatus.WIN ? 1 : 0;
+                }
+                winCount += totalCompletion == 15 ? 1 : 0;
+            }
+            else {
+                var result = PlayLevel.runLevel(agent, Config.LEVEL_STRING, Config.VISUALS);
+                fitness = OutGameEvolution.getFitness(result);
+                totalCompletion += result.getGameStatus() == GameStatus.WIN ? 1 : 0;
+            }
+            System.out.println("Fitness: " + fitness + " Completion: " + totalCompletion);
+            System.out.println("Win Count: " + winCount + " Success Rate: " + (float) winCount / (i+1));
+        }
+        System.out.println("Success Rate: " + (float) winCount / NUM_GENERATION);
+    }
 
     public static void main(String[] args) {
         
         var agent = new Agent(); // Change this to your own agent
         
-        if (Config.RUN_ALL_LEVELS){
-            var result = runLevels(agent, Config.VISUALS);
-            float fitness = 0;
-            for (var r : result){
-                fitness += r.getCompletionPercentage() * r.getRemainingTime();
-            }
-        }
-        else {
-            MarioResult result = runLevel(agent, Config.LEVEL_STRING, Config.VISUALS);
-            printResults(result);
-            Logger.getInstance().logLevelResult(result, Config.LEVEL_STRING);
-        }
+        randomnessTest();
+//        if (Config.RUN_ALL_LEVELS){
+//            var result = runLevels(agent, Config.VISUALS, false);
+//            float fitness = 0;
+//            for (var r : result){
+//                fitness += r.getCompletionPercentage() * r.getRemainingTime();
+//            }
+//        }
+//        else {
+//            MarioResult result = runLevel(agent, Config.LEVEL_STRING, Config.VISUALS);
+//            printResults(result);
+//            Logger.getInstance().logLevelResult(result, Config.LEVEL_STRING);
+//        }
     }
 }
