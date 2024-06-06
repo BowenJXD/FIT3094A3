@@ -109,6 +109,7 @@ public class PlayLevel {
                     fitness += OutGameEvolution.getFitness(results.get(j));
                     totalCompletion += results.get(j).getGameStatus() == GameStatus.WIN ? 1 : 0;
                 }
+                fitness = fitness / results.size();
                 winCount += totalCompletion == 15 ? 1 : 0;
             }
             else {

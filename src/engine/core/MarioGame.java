@@ -6,6 +6,7 @@ import java.awt.*;
 import java.awt.event.KeyAdapter;
 
 import javax.swing.JFrame;
+import javax.xml.transform.Result;
 
 import agents.human.Agent;
 import engine.helper.GameStatus;
@@ -192,7 +193,11 @@ public class MarioGame {
      * @return statistics about the current game
      */
     public MarioResult runGame(MarioAgent agent, String level, int timer, int marioState, boolean visuals, int fps) {
-        return this.runGame(agent, level, timer, marioState, visuals, fps, 2);
+        double startTime = System.currentTimeMillis();
+        var result = this.runGame(agent, level, timer, marioState, visuals, fps, 2);
+        double endTime = System.currentTimeMillis();
+        System.out.println("Real Time taken: " + (endTime - startTime) + "ms");
+        return result;
     }
 
     /**

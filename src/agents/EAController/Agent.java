@@ -14,9 +14,15 @@ public class Agent implements MarioAgent {
     private Population[] populations = new Population[Config.NUM_POPULATION];
     private Individual bestCache = null;
     private MarioForwardModel modelCache = null;
+    public float tickRate = 2;
+    public float tick;
 
     @Override
     public void initialize(MarioForwardModel model, MarioTimer timer) {
+        step = 0;
+        bestCache = null;
+        tickRate = model.getLevelFloatDimensions()[0] / 1500;
+        
         Config.rand = new Random(Config.RANDOM_SEED);
         actions = new boolean[MarioActions.numberOfActions()];
         actions[MarioActions.SPEED.getValue()] = true;
@@ -40,6 +46,12 @@ public class Agent implements MarioAgent {
     @Override
     public boolean[] getActions(MarioForwardModel model, MarioTimer timer) {
         step++;
+        if (bestCache != null && tick < tickRate) {
+            tick++;
+            actions = bestCache.nextActions(step);
+            return actions;
+        }
+        tick -= tickRate;
         
         Individual best = null;
         for (int g = 0; g < 10; g++) {
