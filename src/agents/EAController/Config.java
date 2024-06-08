@@ -44,12 +44,11 @@ public class Config {
     public static int NUM_GENERATION = 72;
     public static int BESTCACHE_AGE = LENGTH / 2;
     
-    public static int RANDOM_SEED = 99;
-    public static Random rand = new Random(RANDOM_SEED);
+    public static Random rand = new Random();
 
-    public static String LEVEL_STRING = "8-1";
+    public static String LEVEL_STRING = "6-3";
     public static boolean VISUALS = true;
-    public static boolean RUN_ALL_LEVELS = false;
+    public static boolean RUN_ALL_LEVELS = true;
     public static String LOAD_DATA_PATH = "";
     
     public static int FLOOR_Y = 207;

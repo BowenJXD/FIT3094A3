@@ -151,8 +151,7 @@ public class GameConfig {
         }
     }
     
-    public static final int RANDOM_SEED = Config.RANDOM_SEED;
-    public static Random rand = new Random(RANDOM_SEED);
+    public static Random rand = new Random();
     
     public static int getRandomBetween(int min, int max){
         return rand.nextInt(max + 1 - min) + min;

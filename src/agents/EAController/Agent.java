@@ -23,7 +23,6 @@ public class Agent implements MarioAgent {
         bestCache = null;
         tickRate = model.getLevelFloatDimensions()[0] / 1500;
         
-        Config.rand = new Random(Config.RANDOM_SEED);
         actions = new boolean[MarioActions.numberOfActions()];
         actions[MarioActions.SPEED.getValue()] = true;
         actions[MarioActions.RIGHT.getValue()] = true;

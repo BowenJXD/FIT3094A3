@@ -1,20 +1,37 @@
-{"fitness":5253.0,"predictionLength":25,"populationSize":40,"offspringSizeIndex":46,"elitismSizeIndex":72,"mutationProbabilityIndex":94,"numPopulation":2,"numGeneration":53,"bestCacheAgeIndex":70}
-{"fitness":4502.82,"predictionLength":25,"populationSize":43,"offspringSizeIndex":69,"elitismSizeIndex":39,"mutationProbabilityIndex":94,"numPopulation":2,"numGeneration":22,"bestCacheAgeIndex":81}
-{"fitness":5223.0,"predictionLength":20,"populationSize":15,"offspringSizeIndex":69,"elitismSizeIndex":61,"mutationProbabilityIndex":85,"numPopulation":3,"numGeneration":37,"bestCacheAgeIndex":81}
-{"fitness":5196.0,"predictionLength":20,"populationSize":15,"offspringSizeIndex":69,"elitismSizeIndex":39,"mutationProbabilityIndex":89,"numPopulation":2,"numGeneration":65,"bestCacheAgeIndex":46}
-{"fitness":5300.0,"predictionLength":30,"populationSize":40,"offspringSizeIndex":50,"elitismSizeIndex":50,"mutationProbabilityIndex":60,"numPopulation":2,"numGeneration":20,"bestCacheAgeIndex":50}
-{"fitness":48432.0,"predictionLength":26,"populationSize":40,"offspringSizeIndex":47,"elitismSizeIndex":18,"mutationProbabilityIndex":65,"numPopulation":2,"numGeneration":20,"bestCacheAgeIndex":50}
-{"fitness":47400.0,"predictionLength":20,"populationSize":15,"offspringSizeIndex":69,"elitismSizeIndex":61,"mutationProbabilityIndex":89,"numPopulation":2,"numGeneration":76,"bestCacheAgeIndex":12}
-{"fitness":46122.0,"predictionLength":20,"populationSize":15,"offspringSizeIndex":46,"elitismSizeIndex":72,"mutationProbabilityIndex":85,"numPopulation":3,"numGeneration":37,"bestCacheAgeIndex":70}
-{"fitness":150180.0,"predictionLength":30,"populationSize":15,"offspringSizeIndex":50,"elitismSizeIndex":15,"mutationProbabilityIndex":60,"numPopulation":2,"numGeneration":37,"bestCacheAgeIndex":50}
-{"fitness":150268.0,"predictionLength":26,"populationSize":15,"offspringSizeIndex":69,"elitismSizeIndex":72,"mutationProbabilityIndex":89,"numPopulation":2,"numGeneration":20,"bestCacheAgeIndex":50}
-{"fitness":49177.016,"predictionLength":26,"populationSize":40,"offspringSizeIndex":69,"elitismSizeIndex":18,"mutationProbabilityIndex":43,"numPopulation":2,"numGeneration":20,"bestCacheAgeIndex":70}
-{"fitness":50215.035,"predictionLength":26,"populationSize":22,"offspringSizeIndex":69,"elitismSizeIndex":63,"mutationProbabilityIndex":67,"numPopulation":2,"numGeneration":20,"bestCacheAgeIndex":52}
-{"fitness":48671.59,"predictionLength":26,"populationSize":22,"offspringSizeIndex":69,"elitismSizeIndex":27,"mutationProbabilityIndex":88,"numPopulation":2,"numGeneration":25,"bestCacheAgeIndex":55}
-{"fitness":48671.59,"predictionLength":26,"populationSize":22,"offspringSizeIndex":69,"elitismSizeIndex":27,"mutationProbabilityIndex":88,"numPopulation":2,"numGeneration":25,"bestCacheAgeIndex":55}
-{"fitness":150592.0,"predictionLength":30,"populationSize":15,"offspringSizeIndex":69,"elitismSizeIndex":72,"mutationProbabilityIndex":60,"numPopulation":2,"numGeneration":37,"bestCacheAgeIndex":50}
-{"fitness":150364.0,"predictionLength":26,"populationSize":17,"offspringSizeIndex":69,"elitismSizeIndex":78,"mutationProbabilityIndex":77,"numPopulation":2,"numGeneration":20,"bestCacheAgeIndex":52}
-{"fitness":48133.438,"predictionLength":30,"populationSize":15,"offspringSizeIndex":69,"elitismSizeIndex":68,"mutationProbabilityIndex":64,"numPopulation":2,"numGeneration":25,"bestCacheAgeIndex":51}
+{"fitness":5253.0,"predictionLength":25,"populationSize":40,"offspringSizeIndex":46,"elitismSizeIndex":72,
+  "mutationProbabilityIndex":94,"numPopulation":2,"numGeneration":53,"bestCacheAgeIndex":70}
+{"fitness":4502.82,"predictionLength":25,"populationSize":43,"offspringSizeIndex":69,"elitismSizeIndex":39,
+  "mutationProbabilityIndex":94,"numPopulation":2,"numGeneration":22,"bestCacheAgeIndex":81}
+{"fitness":5223.0,"predictionLength":20,"populationSize":15,"offspringSizeIndex":69,"elitismSizeIndex":61,
+  "mutationProbabilityIndex":85,"numPopulation":3,"numGeneration":37,"bestCacheAgeIndex":81}
+{"fitness":5196.0,"predictionLength":20,"populationSize":15,"offspringSizeIndex":69,"elitismSizeIndex":39,
+  "mutationProbabilityIndex":89,"numPopulation":2,"numGeneration":65,"bestCacheAgeIndex":46}
+{"fitness":5300.0,"predictionLength":30,"populationSize":40,"offspringSizeIndex":50,"elitismSizeIndex":50,
+  "mutationProbabilityIndex":60,"numPopulation":2,"numGeneration":20,"bestCacheAgeIndex":50}
+{"fitness":48432.0,"predictionLength":26,"populationSize":40,"offspringSizeIndex":47,"elitismSizeIndex":18,
+  "mutationProbabilityIndex":65,"numPopulation":2,"numGeneration":20,"bestCacheAgeIndex":50}
+{"fitness":47400.0,"predictionLength":20,"populationSize":15,"offspringSizeIndex":69,"elitismSizeIndex":61,
+  "mutationProbabilityIndex":89,"numPopulation":2,"numGeneration":76,"bestCacheAgeIndex":12}
+{"fitness":46122.0,"predictionLength":20,"populationSize":15,"offspringSizeIndex":46,"elitismSizeIndex":72,
+  "mutationProbabilityIndex":85,"numPopulation":3,"numGeneration":37,"bestCacheAgeIndex":70}
+{"fitness":150180.0,"predictionLength":30,"populationSize":15,"offspringSizeIndex":50,"elitismSizeIndex":15,
+  "mutationProbabilityIndex":60,"numPopulation":2,"numGeneration":37,"bestCacheAgeIndex":50}
+{"fitness":150268.0,"predictionLength":26,"populationSize":15,"offspringSizeIndex":69,"elitismSizeIndex":72,
+  "mutationProbabilityIndex":89,"numPopulation":2,"numGeneration":20,"bestCacheAgeIndex":50}
+{"fitness":49177.016,"predictionLength":26,"populationSize":40,"offspringSizeIndex":69,"elitismSizeIndex":18,
+  "mutationProbabilityIndex":43,"numPopulation":2,"numGeneration":20,"bestCacheAgeIndex":70}
+{"fitness":50215.035,"predictionLength":26,"populationSize":22,"offspringSizeIndex":69,"elitismSizeIndex":63,
+  "mutationProbabilityIndex":67,"numPopulation":2,"numGeneration":20,"bestCacheAgeIndex":52}
+{"fitness":48671.59,"predictionLength":26,"populationSize":22,"offspringSizeIndex":69,"elitismSizeIndex":27,
+  "mutationProbabilityIndex":88,"numPopulation":2,"numGeneration":25,"bestCacheAgeIndex":55}
+{"fitness":48671.59,"predictionLength":26,"populationSize":22,"offspringSizeIndex":69,"elitismSizeIndex":27,
+  "mutationProbabilityIndex":88,"numPopulation":2,"numGeneration":25,"bestCacheAgeIndex":55}
+{"fitness":150592.0,"predictionLength":30,"populationSize":15,"offspringSizeIndex":69,"elitismSizeIndex":72,
+  "mutationProbabilityIndex":60,"numPopulation":2,"numGeneration":37,"bestCacheAgeIndex":50}
+{"fitness":150364.0,"predictionLength":26,"populationSize":17,"offspringSizeIndex":69,"elitismSizeIndex":78,
+  "mutationProbabilityIndex":77,"numPopulation":2,"numGeneration":20,"bestCacheAgeIndex":52}
+{"fitness":48133.438,"predictionLength":30,"populationSize":15,"offspringSizeIndex":69,"elitismSizeIndex":68,
+  "mutationProbabilityIndex":64,"numPopulation":2,"numGeneration":25,"bestCacheAgeIndex":51}
 {"fitness":150620.0,"predictionLength":30,"populationSize":19,"offspringSizeIndex":69,"elitismSizeIndex":64,"mutationProbabilityIndex":77,"numPopulation":2,"numGeneration":37,"bestCacheAgeIndex":52}
 {"fitness":48255.473,"predictionLength":26,"populationSize":22,"offspringSizeIndex":69,"elitismSizeIndex":64,"mutationProbabilityIndex":31,"numPopulation":2,"numGeneration":20,"bestCacheAgeIndex":51}
 {"fitness":147598.0,"predictionLength":40,"populationSize":15,"offspringSizeIndex":69,"elitismSizeIndex":26,"mutationProbabilityIndex":27,"numPopulation":2,"numGeneration":20,"bestCacheAgeIndex":52}
@@ -31,3 +48,4 @@
 {"fitness":150498.0,"predictionLength":26,"populationSize":22,"offspringSizeIndex":69,"elitismSizeIndex":50,"mutationProbabilityIndex":85,"numPopulation":2,"numGeneration":25,"bestCacheAgeIndex":55}
 {"fitness":150498.0,"predictionLength":26,"populationSize":22,"offspringSizeIndex":69,"elitismSizeIndex":50,"mutationProbabilityIndex":85,"numPopulation":2,"numGeneration":25,"bestCacheAgeIndex":55}
 150560
+150448

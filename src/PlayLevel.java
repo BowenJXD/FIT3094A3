@@ -54,7 +54,7 @@ public class PlayLevel {
     }
     
     public static List<MarioResult> runLevels(MarioAgent agent, boolean visual, boolean quitOnFail){
-        String[] levels = getAllLevels("./levels/SuperMarioBros");
+        String[] levels = getAllLevels("./levels/SuperMarioBros2");
 
         MarioGame game = new MarioGame();
         List<MarioResult> results = new ArrayList<>();
@@ -62,8 +62,8 @@ public class PlayLevel {
             MarioResult result = game.runGame(agent, getLevel(level), 60, 0, visual, visual ? 60 : 1000);
             results.add(result);
             game.CloseWindow();
-            String levelName = level.substring(level.lastIndexOf("-") - 1, level.lastIndexOf(".")).replace("-", ".");
-            Logger.getInstance().logLevelResult(result, levelName);
+            // String levelName = level.substring(level.lastIndexOf("-") - 1, level.lastIndexOf(".")).replace("-", ".");
+            Logger.getInstance().logLevelResult(result, level);
             if (quitOnFail && result.getGameStatus() != engine.helper.GameStatus.WIN) {
                 return results;
             }
@@ -104,7 +104,7 @@ public class PlayLevel {
 
             float fitness = 0;
             if (Config.RUN_ALL_LEVELS) {
-                var results = PlayLevel.runLevels(agent, true, true);
+                var results = PlayLevel.runLevels(agent, true, false);
                 for (int j = 0; j < results.size(); j++) {
                     fitness += OutGameEvolution.getFitness(results.get(j));
                     totalCompletion += results.get(j).getGameStatus() == GameStatus.WIN ? 1 : 0;
